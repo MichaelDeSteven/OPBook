@@ -35,11 +35,17 @@
                 <form role="form" method="post" id="memberInfoForm">
                   <div class="form-group">
                     <label>邮箱</label>
-                    <input type="text" class="form-control" value disabled v-model="user.email"/>
+                    <input type="text" class="form-control" value disabled v-model="user.email" />
                   </div>
                   <div class="form-group">
                     <label>昵称</label>
-                    <input type="text" class="form-control" name="nickname" value v-model="user.nickname"/>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="nickname"
+                      value
+                      v-model="user.nickname"
+                    />
                   </div>
                   <div class="form-group">
                     <label>手机号</label>
@@ -56,7 +62,12 @@
                     />
                   </div>
                   <div class="form-group">
-                    <button type="button" class="btn btn-success" data-loading-text="保存中..." @click="UpdateUserProfile">保存修改</button>
+                    <button
+                      type="button"
+                      class="btn btn-success"
+                      data-loading-text="保存中..."
+                      @click="UpdateUserProfile"
+                    >保存修改</button>
                     <span id="form-error-message" class="error-message"></span>
                   </div>
                 </form>
@@ -135,7 +146,7 @@ export default {
         mobile: "",
         avatar: "",
         email: "",
-        password: ""
+        password: "",
       },
     };
   },
@@ -166,12 +177,12 @@ export default {
           console.log(obj.blob);
           console.log(cropper);
           let formData = new FormData();
-          var img = obj.blob.source
+          var img = obj.blob.source;
           formData.append("image-file", img);
-          formData.append("x", cropper.x)
-          formData.append("y", cropper.y)
-          formData.append("width", cropper.width)
-          formData.append("height", cropper.height)
+          formData.append("x", cropper.x);
+          formData.append("y", cropper.y);
+          formData.append("width", cropper.width);
+          formData.append("height", cropper.height);
           service({
             url: "/user/setting/upload",
             method: "post",
@@ -183,7 +194,6 @@ export default {
             console.log(res);
             layer.msg(res.data.msg);
             if (res.code === 0) {
-
             }
             $("#upload-logo-panel").modal("hide");
           });
@@ -251,29 +261,29 @@ export default {
   },
   methods: {
     GetUserProfile() {
-        var u = JSON.parse(localStorage.getItem('user'))
-        this.user.nickname = u.nickname
-        this.user.email = u.email
-        this.user.mobile = u.mobile
-        this.user.avatar = u.avatar
-        this.user.email = u.email
-        this.user.password = u.password
+      var u = JSON.parse(localStorage.getItem("user"));
+      this.user.nickname = u.nickname;
+      this.user.email = u.email;
+      this.user.mobile = u.mobile;
+      this.user.avatar = u.avatar;
+      this.user.email = u.email;
+      this.user.password = u.password;
     },
     UpdateUserProfile() {
       service({
         url: "/user/update",
         method: "post",
-        data: this.user
+        data: this.user,
       }).then((res) => {
         layer.msg(res.data.msg);
         if (res.data.code === 0) {
           this.user = res.data.data;
-          localStorage.setItem('user', JSON.stringify(res.data.data))
-          window.location = "/setting"
+          localStorage.setItem("user", JSON.stringify(res.data.data));
+          window.location = "/setting";
         } else {
         }
       });
-    }
+    },
   },
   created() {
     // watch 路由的参数，以便再次获取数据

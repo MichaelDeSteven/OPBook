@@ -116,7 +116,7 @@ export default {
         email: "",
         password1: "",
         password2: "",
-        nickname: ""
+        nickname: "",
       },
     };
   },
@@ -139,11 +139,11 @@ export default {
         return false;
       }
       var data = {
-        email : this.user.email,
-        password : this.user.password1,
-        nickname : this.user.nickname
+        email: this.user.email,
+        password: this.user.password1,
+        nickname: this.user.nickname,
       };
-      console.log(data)
+      console.log(data);
       service({
         url: "/user/reg",
         method: "post",

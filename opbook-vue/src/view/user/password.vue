@@ -47,7 +47,12 @@
                 />
               </div>
               <div class="form-group">
-                <button type="button" class="btn btn-success" data-loading-text="保存中..." @click="UpdateUserPassword">保存修改</button>
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  data-loading-text="保存中..."
+                  @click="UpdateUserPassword"
+                >保存修改</button>
                 <span id="form-error-message" class="error-message"></span>
               </div>
             </form>
@@ -110,7 +115,7 @@ export default {
         layer.msg(res.data.msg);
         if (res.data.code === 0) {
           localStorage.setItem("user", JSON.stringify(res.data.data));
-          window.location = "/password"
+          window.location = "/password";
         } else {
         }
       });

@@ -75,7 +75,7 @@
                         <a class="tooltips" href="" rel="nofollow" title="使用GitHub一键登录">
                             <img src="/static/images/github.png" alt="GitHub">
                         </a>
-                </div> -->
+                </div>-->
               </div>
             </form>
           </div>
@@ -123,8 +123,8 @@ export default {
         console.log(res);
         if (res.data.code === 0) {
           layer.msg(res.data.msg);
-          localStorage.setItem('user', JSON.stringify(res.data.data.user))
-          localStorage.setItem('token', res.data.data.token)
+          localStorage.setItem("user", JSON.stringify(res.data.data.user));
+          localStorage.setItem("token", res.data.data.token);
           window.location = "/user";
         } else {
           layer.msg(res.data.msg);
