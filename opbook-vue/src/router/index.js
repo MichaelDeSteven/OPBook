@@ -8,6 +8,7 @@ import Email from '@/view/login/email'
 import Login from '@/view/login/login'
 import Setting from '@/view/user/setting'
 import Password from '@/view/user/password'
+import BookIndex from '@/view/book/index'
 
 Vue.use(Router)
 
@@ -53,6 +54,11 @@ export default new Router({
         path: '/password',
         name: 'Password',
         component: Password
+    },
+    {
+        path: '/book',
+        name: 'BookIndex',
+        component: BookIndex
     }
   ]
 })
