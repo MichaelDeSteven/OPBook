@@ -18,7 +18,7 @@ type User struct {
 	Status        int       `gorm:"default:0;" json:"status"`                    // 用户状态：0 正常/1 禁用
 	CreateTime    time.Time `gorm:"autoCreateTime" json:"create_time"`           // 创建时间
 	LastLoginTime time.Time `gorm:"autoUpdateTime:milli" json:"last_login_time"` // 最后登录时间
-	UpdateTime    time.Time `gorm:"autoUpdateTime:milli" json:"updateTime"`      // 更新时间
+	UpdateTime    time.Time `gorm:"autoUpdateTime:milli" json:"update_time"`     // 更新时间
 	IsDeleted     int       `gorm:"default:0;" json:"is_deleted"`                // 逻辑删除（0:可用 1:不可用）
 }
 

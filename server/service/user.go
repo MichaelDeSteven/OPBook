@@ -38,7 +38,7 @@ func (userService *UserService) UpdateUserInfo(u *model.User) error {
 	return u.Update(u)
 }
 
-func (UserService *UserService) GetUserProfile(uid int) *model.User {
+func (userService *UserService) GetUserProfile(uid int) *model.User {
 	u := &model.User{}
 	return u.FindByUid(uid)
 }
