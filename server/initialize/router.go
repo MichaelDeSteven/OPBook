@@ -8,8 +8,10 @@ import (
 func Routers() *rum.Engine {
 	r := rum.Default()
 	PublicGroup := r.Group("")
+	base := router.BaseRouter{}
 	user := router.UserRouter{}
 	book := router.BookRouter{}
+	base.InitBaseRouter(PublicGroup)
 	user.InitUserRouter(PublicGroup)
 	book.InitBookRouter(PublicGroup)
 	return r

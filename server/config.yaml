@@ -60,7 +60,9 @@ jwt:
 
 # local configuration
 local:
-  path: "uploads/file"
+  path: "uploads" # 资源所在项目根下的目录名
+  # 如果静态资源为本地存储，那么访问资源url为http://IP:PORT/relativePath/file, 其中file为文件的相对路径
+  relativePath: "/uploads"
 
 # qiniu configuration (请自行七牛申请对应的 公钥 私钥 bucket 和 域名地址)
 qiniu:
