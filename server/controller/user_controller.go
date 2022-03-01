@@ -14,7 +14,6 @@ import (
 	"github.com/MichaelDeSteven/OPBook/server/model/system/request"
 	"github.com/MichaelDeSteven/OPBook/server/utils"
 	"github.com/MichaelDeSteven/rum"
-	"go.uber.org/zap"
 )
 
 func Login(c *rum.Context) {
@@ -24,7 +23,7 @@ func Login(c *rum.Context) {
 		response.FailWithMessage("用户的账号或者密码为空", c)
 		return
 	}
-	global.LOG.Info("[Login]", zap.Any("user", user))
+	global.LOG.Sugar().Infof("[Login] user: %+v\n", user)
 	res, err := userService.Login(&user)
 	if err != nil {
 		response.FailWithError(err, c)
@@ -43,7 +42,7 @@ func tokenNext(c *rum.Context, user *model.User) {
 	})
 	token, err := j.CreateToken(claims)
 	if err != nil {
-		global.LOG.Error("获取token失败!", zap.Error(err))
+		global.LOG.Sugar().Errorf("获取token失败! ", err)
 		response.FailWithMessage("获取token失败", c)
 		return
 	}
@@ -58,7 +57,7 @@ func tokenNext(c *rum.Context, user *model.User) {
 func Reg(c *rum.Context) {
 	user := model.User{}
 	c.Bind(&user)
-	global.LOG.Info("[Reg]", zap.Any("user", user))
+	global.LOG.Sugar().Infof("[Reg] user: %+v\n", user)
 	if user.Email == "" || user.Password == "" {
 		response.FailWithMessage("用户的账号或者密码为空", c)
 		return
@@ -188,7 +187,7 @@ func UploadAvatar(c *rum.Context) {
 	os.MkdirAll(path, os.ModePerm)
 
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
-		global.LOG.Error("保存图片失败:", zap.Error(err))
+		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
 		response.FailWithMessage("保存图片失败", c)
 	}
 
@@ -196,7 +195,7 @@ func UploadAvatar(c *rum.Context) {
 	subImg, err := graphics.ImageCopyFromFile(filePath, x, y, width, height)
 
 	if err != nil {
-		global.LOG.Error("头像剪切失败:", zap.Error(err))
+		global.LOG.Sugar().Errorf("头像剪切失败: %+v\n", err)
 		response.FailWithMessage("头像剪切失败", c)
 	}
 	os.Remove(filePath)
@@ -207,7 +206,7 @@ func UploadAvatar(c *rum.Context) {
 	err = graphics.SaveImage(filePath, subImg)
 
 	if err != nil {
-		global.LOG.Error("保存图片失败:", zap.Error(err))
+		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
 		response.FailWithMessage("保存图片失败", c)
 	}
 
@@ -220,7 +219,7 @@ func UploadAvatar(c *rum.Context) {
 	oldAvatar := user.Avatar
 	user.Avatar = url
 	if err := user.Update(user); err != nil {
-		global.LOG.Error("保存头像失败:", zap.Error(err))
+		global.LOG.Sugar().Errorf("保存头像失败: %+v\n", err)
 		response.FailWithMessage("保存头像失败", c)
 		return
 	}
