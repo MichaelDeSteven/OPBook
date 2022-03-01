@@ -1,61 +1,108 @@
 # system configuration
 system:
-  env: 'dev'
-  addr: ':9678'
-  db-type: 'mysql'
-  oss-type: 'local'    # 控制oss选择走本地还是 七牛等其他仓 自行增加其他oss仓可以在 server/utils/upload/upload.go 中 NewOss函数配置
+  env: "dev"
+  addr: ":9678"
+  db-type: "mysql"
+  oss-type: "local" # 控制oss选择走本地还是 七牛等其他仓 自行增加其他oss仓可以在 server/utils/upload/upload.go 中 NewOss函数配置
   use-multipoint: false
   # IP限制次数 一个小时15000次
   iplimit-count: 15000
   #  IP限制一个小时
   iplimit-time: 3600
 
-
 mysql:
-  path: '127.0.0.1'
-  port: '3306'
-  config: 'charset=utf8mb4&parseTime=true&loc=Local'
-  db-name: 'opbook'
-  username: 'root'
-  password: 'root'
+  path: "127.0.0.1"
+  port: "3306"
+  config: "charset=utf8mb4&parseTime=true&loc=Local"
+  db-name: "opbook"
+  username: "root"
+  password: "root"
   max-idle-conns: 10
   max-open-conns: 100
   log-mode: "info"
   log-zap: false
 
 db-list: [
-  {
-    disabled: true, # 是否启用
-    type: "", # 数据库的类型,目前支持mysql、pgsql
-    alias-name: "", # 数据库的名称,注意: alias-name 需要在db-list中唯一
-    path: '',
-    port: '',
-    config: '',
-    db-name: '',
-    username: '',
-    password: '',
-    max-idle-conns: 10,
-    max-open-conns: 100,
-    log-mode: "",
-    log-zap: false,
-  }
-]
+    {
+      disabled: true, # 是否启用
+      type: "", # 数据库的类型,目前支持mysql、pgsql
+      alias-name: "", # 数据库的名称,注意: alias-name 需要在db-list中唯一
+      path: "",
+      port: "",
+      config: "",
+      db-name: "",
+      username: "",
+      password: "",
+      max-idle-conns: 10,
+      max-open-conns: 100,
+      log-mode: "",
+      log-zap: false,
+    },
+  ]
 
 # zap logger configuration
 zap:
-  level: 'info'
-  format: 'console'
-  prefix: '[opbook-server]'
-  director: 'log'
+  level: "info"
+  format: "console"
+  prefix: "[opbook-server]"
+  director: "log"
   show-line: true
-  encode-level: 'CapitalColorLevelEncoder'
-  stacktrace-key: 'stacktrace'
+  encode-level: "CapitalColorLevelEncoder"
+  stacktrace-key: "stacktrace"
   log-in-console: true
-
 
 # jwt configuration
 jwt:
-  signing-key: 'qmPlus'
+  signing-key: "qmPlus"
   expires-time: 604800
   buffer-time: 86400
-  issuer: 'qmPlus'
+  issuer: "qmPlus"
+
+# local configuration
+local:
+  path: "uploads/file"
+
+# qiniu configuration (请自行七牛申请对应的 公钥 私钥 bucket 和 域名地址)
+qiniu:
+  zone: ""
+  bucket: ""
+  img-path: ""
+  use-https: false
+  access-key: ""
+  secret-key: ""
+  use-cdn-domains: false
+
+# aliyun oss configuration
+aliyun-oss:
+  endpoint: "yourEndpoint"
+  access-key-id: "yourAccessKeyId"
+  access-key-secret: "yourAccessKeySecret"
+  bucket-name: "yourBucketName"
+  bucket-url: "yourBucketUrl"
+  base-path: "yourBasePath"
+
+# tencent cos configuration
+tencent-cos:
+  bucket: ""
+  region: ""
+  secret-id: ""
+  secret-key: ""
+  base-url: ""
+  path-prefix: ""
+
+# aws s3 configuration
+aws-s3:
+  bucket: ""
+  region: ""
+  secret-id: ""
+  secret-key: ""
+  base-url: ""
+  path-prefix: ""
+
+# huawei obs configuration
+hua-wei-obs:
+  path: ""
+  bucket: ""
+  endpoint: ""
+  access-key: ""
+  secret-key: ""
