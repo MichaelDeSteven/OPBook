@@ -3,11 +3,7 @@
     <div class="panel panel-default">
       <div class="panel-heading">个人主页</div>
       <div class="panel-body">
-        <img
-          class="thumbnail"
-          src="https://cdn.acwing.com/media/user/profile/photo/94000_lg_5d8f5dcb89.jpg"
-          alt
-        />
+        <img class="thumbnail" :src="profile.avatar" alt />
         <div class="ucenter-info">
           <h3>
             <span>{{profile.nickname}}</span>

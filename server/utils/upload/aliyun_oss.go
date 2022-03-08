@@ -40,6 +40,10 @@ func (*AliyunOSS) UploadFile(file *multipart.FileHeader) (string, string, error)
 	return global.CONFIG.AliyunOSS.BucketUrl + "/" + yunFileTmpPath, yunFileTmpPath, nil
 }
 
+func (*AliyunOSS) UploadFileByPath(src string, fileName, ext string) (string, string, error) {
+	return "", "", nil
+}
+
 func (*AliyunOSS) DeleteFile(key string) error {
 	bucket, err := NewBucket()
 	if err != nil {

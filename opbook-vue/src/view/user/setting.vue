@@ -193,7 +193,10 @@ export default {
           }).then((res) => {
             console.log(res);
             layer.msg(res.data.msg);
-            if (res.code === 0) {
+            if (res.data.code === 0) {
+              this.user = res.data.data;
+              localStorage.setItem("user", JSON.stringify(res.data.data));
+              window.location = "/setting";
             }
             $("#upload-logo-panel").modal("hide");
           });

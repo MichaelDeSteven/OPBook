@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -75,11 +76,37 @@ func (*Local) UploadFile(file *multipart.FileHeader) (string, string, error) {
 //@return: error
 
 func (*Local) DeleteFile(key string) error {
-	p := global.CONFIG.Local.Path + "/" + key
-	if strings.Contains(p, global.CONFIG.Local.Path) {
-		if err := os.Remove(p); err != nil {
-			return errors.New("本地文件删除失败, err:" + err.Error())
-		}
+	if err := os.Remove(key); err != nil {
+		return errors.New("本地文件删除失败, err:" + err.Error())
 	}
 	return nil
+}
+
+func (*Local) UploadFileByPath(src string, fileName, ext string) (string, string, error) {
+	f, err := os.OpenFile(src, os.O_SYNC|os.O_RDWR|os.O_CREATE, 0666)
+
+	if err != nil {
+		return "", "", err
+	}
+	defer f.Close()
+	target := filepath.Join("./", global.CONFIG.Local.Path, global.CONFIG.Local.Avator, time.Now().Format("200601"))
+	// 尝试创建此路径
+	mkdirErr := os.MkdirAll(target, os.ModePerm)
+	if mkdirErr != nil {
+		global.LOG.Error("function os.MkdirAll() Filed", zap.Any("err", mkdirErr.Error()))
+		return "", "", errors.New("function os.MkdirAll() Filed, err:" + mkdirErr.Error())
+	}
+	dst := filepath.Join(target, fileName+ext)
+	out, createErr := os.Create(dst)
+	if createErr != nil {
+		global.LOG.Error("function os.Create() Filed", zap.Any("err", createErr.Error()))
+		return "", "", errors.New("function os.Create() Filed, err:" + createErr.Error())
+	}
+	defer out.Close()             // 创建文件 defer 关闭
+	_, copyErr := io.Copy(out, f) // 传输（拷贝）文件
+	if copyErr != nil {
+		global.LOG.Error("function io.Copy() Filed", zap.Any("err", copyErr.Error()))
+		return "", "", errors.New("function io.Copy() Filed, err:" + copyErr.Error())
+	}
+	return dst, fileName + ext, nil
 }

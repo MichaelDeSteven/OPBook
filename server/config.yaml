@@ -61,8 +61,11 @@ jwt:
 # local configuration
 local:
   path: "uploads" # 资源所在项目根下的目录名
+  avator: "avator" # path目录下的头像目录
+  book: "book" # path目录下的书籍目录
   # 如果静态资源为本地存储，那么访问资源url为http://IP:PORT/relativePath/file, 其中file为文件的相对路径
   relativePath: "/uploads"
+  addr: "http://localhost:9678"
 
 # qiniu configuration (请自行七牛申请对应的 公钥 私钥 bucket 和 域名地址)
 qiniu:
@@ -91,20 +94,3 @@ tencent-cos:
   secret-key: ""
   base-url: ""
   path-prefix: ""
-
-# aws s3 configuration
-aws-s3:
-  bucket: ""
-  region: ""
-  secret-id: ""
-  secret-key: ""
-  base-url: ""
-  path-prefix: ""
-
-# huawei obs configuration
-hua-wei-obs:
-  path: ""
-  bucket: ""
-  endpoint: ""
-  access-key: ""
-  secret-key: ""

@@ -34,6 +34,10 @@ func (*TencentCOS) UploadFile(file *multipart.FileHeader) (string, string, error
 	return global.CONFIG.TencentCOS.BaseURL + "/" + global.CONFIG.TencentCOS.PathPrefix + "/" + fileKey, fileKey, nil
 }
 
+func (*TencentCOS) UploadFileByPath(src string, fileName, ext string) (string, string, error) {
+	return "", "", nil
+}
+
 // DeleteFile delete file form COS
 func (*TencentCOS) DeleteFile(key string) error {
 	client := NewClient()

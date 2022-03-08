@@ -13,6 +13,7 @@ import (
 	"github.com/MichaelDeSteven/OPBook/server/model/response"
 	"github.com/MichaelDeSteven/OPBook/server/model/system/request"
 	"github.com/MichaelDeSteven/OPBook/server/utils"
+	"github.com/MichaelDeSteven/OPBook/server/utils/upload"
 	"github.com/MichaelDeSteven/rum"
 )
 
@@ -29,6 +30,7 @@ func Login(c *rum.Context) {
 		response.FailWithError(err, c)
 		return
 	}
+	res.Avatar = global.CONFIG.Local.Addr + res.Avatar
 	tokenNext(c, res)
 }
 
@@ -133,6 +135,7 @@ func GetUserProfile(c *rum.Context) {
 		response.FailWithMessage("找不到该用户", c)
 		return
 	}
+	user.Avatar = global.CONFIG.Local.Addr + user.Avatar
 	response.OkWithData(user, c)
 }
 
@@ -180,7 +183,7 @@ func UploadAvatar(c *rum.Context) {
 
 	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
 
-	filePath := filepath.Join("./", "uploads", time.Now().Format("2006/01"), fileName+ext)
+	filePath := filepath.Join("./", global.CONFIG.Local.Path, "tmp", global.CONFIG.Local.Avator, time.Now().Format("2006/01"), fileName+ext)
 
 	path := filepath.Dir(filePath)
 
@@ -200,7 +203,8 @@ func UploadAvatar(c *rum.Context) {
 	}
 	os.Remove(filePath)
 
-	filePath = filepath.Join("./", "uploads", time.Now().Format("200601"), fileName+ext)
+	// 保存剪切图片
+	filePath = filepath.Join("./", global.CONFIG.Local.Path, "tmp", time.Now().Format("200601"), fileName+ext)
 
 	err = graphics.ImageResizeSaveFile(subImg, 120, 120, filePath)
 	err = graphics.SaveImage(filePath, subImg)
@@ -210,11 +214,19 @@ func UploadAvatar(c *rum.Context) {
 		response.FailWithMessage("保存图片失败", c)
 	}
 
-	url := "/" + strings.Replace(strings.TrimPrefix(filePath, "./"), "\\", "/", -1)
+	oss := upload.NewOss()
+	dst, _, err := oss.UploadFileByPath(filePath, fileName, ext)
+	if err != nil {
+		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
+		response.FailWithMessage("保存图片失败", c)
+		return
+	}
+	url := "/" + strings.Replace(strings.TrimPrefix(dst, "./"), "\\", "/", -1)
 	if strings.HasPrefix(url, "//") {
 		url = string(url[1:])
 	}
 
+	// 更新用户头像链接
 	user := userService.GetUserProfile(uid.(int))
 	oldAvatar := user.Avatar
 	user.Avatar = url
@@ -224,8 +236,13 @@ func UploadAvatar(c *rum.Context) {
 		return
 	}
 	if strings.HasPrefix(oldAvatar, "/uploads/") {
-		os.Remove(filepath.Join("./", oldAvatar))
+		err = oss.DeleteFile(filepath.Join("./", oldAvatar))
+		if err != nil {
+			global.LOG.Sugar().Info(err)
+		}
 	}
-
+	os.Remove(filePath)
+	user.Avatar = global.CONFIG.Local.Addr + url
+	global.LOG.Sugar().Info(user.Avatar)
 	response.OkWithDetailed(user, "保存图片成功", c)
 }

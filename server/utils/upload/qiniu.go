@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"mime/multipart"
+	"os"
 	"time"
 
 	"github.com/MichaelDeSteven/OPBook/server/global"
@@ -42,6 +43,35 @@ func (*Qiniu) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	defer f.Close()                                                  // 创建文件 defer 关闭
 	fileKey := fmt.Sprintf("%d%s", time.Now().Unix(), file.Filename) // 文件名格式 自己可以改 建议保证唯一性
 	putErr := formUploader.Put(context.Background(), &ret, upToken, fileKey, f, file.Size, &putExtra)
+	if putErr != nil {
+		global.LOG.Error("function formUploader.Put() Filed", zap.Any("err", putErr.Error()))
+		return "", "", errors.New("function formUploader.Put() Filed, err:" + putErr.Error())
+	}
+	return global.CONFIG.Qiniu.ImgPath + "/" + ret.Key, ret.Key, nil
+}
+
+func (*Qiniu) UploadFileByPath(src string, fileName, ext string) (string, string, error) {
+	putPolicy := storage.PutPolicy{Scope: global.CONFIG.Qiniu.Bucket}
+	mac := qbox.NewMac(global.CONFIG.Qiniu.AccessKey, global.CONFIG.Qiniu.SecretKey)
+	upToken := putPolicy.UploadToken(mac)
+	cfg := qiniuConfig()
+	formUploader := storage.NewFormUploader(cfg)
+	ret := storage.PutRet{}
+	putExtra := storage.PutExtra{Params: map[string]string{"x:name": "github logo"}}
+
+	f, err := os.OpenFile(src, os.O_SYNC|os.O_RDWR|os.O_CREATE, 0666)
+
+	if err != nil {
+		return "", "", err
+	}
+	fi, err := f.Stat()
+	if err != nil {
+		return "", "", err
+	}
+
+	defer f.Close()
+	fileKey := src // 文件名格式 自己可以改 建议保证唯一性
+	putErr := formUploader.Put(context.Background(), &ret, upToken, fileKey, f, fi.Size(), &putExtra)
 	if putErr != nil {
 		global.LOG.Error("function formUploader.Put() Filed", zap.Any("err", putErr.Error()))
 		return "", "", errors.New("function formUploader.Put() Filed, err:" + putErr.Error())
