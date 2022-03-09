@@ -30,6 +30,8 @@ func (userService *UserService) Reg(u *model.User) error {
 	if !utils.Empty(u.Mobile) && u.CheckMobileIsExist(u.Mobile) {
 		return errors.New("手机号码已存在")
 	}
+	// 添加默认头像
+	u.Avatar = utils.DefaultAvatar
 	return u.Add(u)
 }
 

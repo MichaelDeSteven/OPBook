@@ -20,12 +20,8 @@ func NewOss() OSS {
 	switch global.CONFIG.System.OssType {
 	case "local":
 		return &Local{}
-	case "qiniu":
-		return &Qiniu{}
 	case "tencent-cos":
 		return &TencentCOS{}
-	case "aliyun-oss":
-		return &AliyunOSS{}
 	default:
 		return &Local{}
 	}

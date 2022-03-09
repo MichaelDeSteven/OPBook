@@ -30,7 +30,6 @@ func Login(c *rum.Context) {
 		response.FailWithError(err, c)
 		return
 	}
-	res.Avatar = global.CONFIG.Local.Addr + res.Avatar
 	tokenNext(c, res)
 }
 
@@ -135,7 +134,6 @@ func GetUserProfile(c *rum.Context) {
 		response.FailWithMessage("找不到该用户", c)
 		return
 	}
-	user.Avatar = global.CONFIG.Local.Addr + user.Avatar
 	response.OkWithData(user, c)
 }
 
@@ -215,15 +213,11 @@ func UploadAvatar(c *rum.Context) {
 	}
 
 	oss := upload.NewOss()
-	dst, _, err := oss.UploadFileByPath(filePath, fileName, ext)
+	url, _, err := oss.UploadFileByPath(filePath, fileName, ext)
 	if err != nil {
 		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
 		response.FailWithMessage("保存图片失败", c)
 		return
-	}
-	url := "/" + strings.Replace(strings.TrimPrefix(dst, "./"), "\\", "/", -1)
-	if strings.HasPrefix(url, "//") {
-		url = string(url[1:])
 	}
 
 	// 更新用户头像链接
@@ -235,14 +229,9 @@ func UploadAvatar(c *rum.Context) {
 		response.FailWithMessage("保存头像失败", c)
 		return
 	}
-	if strings.HasPrefix(oldAvatar, "/uploads/") {
-		err = oss.DeleteFile(filepath.Join("./", oldAvatar))
-		if err != nil {
-			global.LOG.Sugar().Info(err)
-		}
-	}
 	os.Remove(filePath)
-	user.Avatar = global.CONFIG.Local.Addr + url
-	global.LOG.Sugar().Info(user.Avatar)
+	if err = oss.DeleteFile(oldAvatar); err != nil {
+		global.LOG.Sugar().Info(err)
+	}
 	response.OkWithDetailed(user, "保存图片成功", c)
 }

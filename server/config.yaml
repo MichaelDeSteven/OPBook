@@ -3,7 +3,7 @@ system:
   env: "dev"
   addr: ":9678"
   db-type: "mysql"
-  oss-type: "local" # 控制oss选择走本地还是 七牛等其他仓 自行增加其他oss仓可以在 server/utils/upload/upload.go 中 NewOss函数配置
+  oss-type: "tencent-cos" # 控制oss选择走本地还是 七牛等其他仓 自行增加其他oss仓可以在 server/utils/upload/upload.go 中 NewOss函数配置
   use-multipoint: false
   # IP限制次数 一个小时15000次
   iplimit-count: 15000
@@ -67,30 +67,11 @@ local:
   relativePath: "/uploads"
   addr: "http://localhost:9678"
 
-# qiniu configuration (请自行七牛申请对应的 公钥 私钥 bucket 和 域名地址)
-qiniu:
-  zone: ""
-  bucket: ""
-  img-path: ""
-  use-https: false
-  access-key: ""
-  secret-key: ""
-  use-cdn-domains: false
-
-# aliyun oss configuration
-aliyun-oss:
-  endpoint: "yourEndpoint"
-  access-key-id: "yourAccessKeyId"
-  access-key-secret: "yourAccessKeySecret"
-  bucket-name: "yourBucketName"
-  bucket-url: "yourBucketUrl"
-  base-path: "yourBasePath"
-
 # tencent cos configuration
 tencent-cos:
-  bucket: ""
-  region: ""
-  secret-id: ""
-  secret-key: ""
-  base-url: ""
-  path-prefix: ""
+  bucket: "opbook-1304588036"
+  region: "ap-hongkong"
+  secret-id: "AKIDFG6i5LCAj0EguvuEAuSCiAU1cxAJjetv"
+  secret-key: "0pOjqhV9apvxwhBcw2e06TbUJ3atSlT4"
+  base-url: "https://opbook-1304588036.cos.ap-hongkong.myqcloud.com"
+  path-prefix: "file"

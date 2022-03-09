@@ -7,6 +7,9 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/MichaelDeSteven/OPBook/server/global"
@@ -35,13 +38,31 @@ func (*TencentCOS) UploadFile(file *multipart.FileHeader) (string, string, error
 }
 
 func (*TencentCOS) UploadFileByPath(src string, fileName, ext string) (string, string, error) {
-	return "", "", nil
+	client := NewClient()
+	f, err := os.OpenFile(src, os.O_SYNC|os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return "", "", err
+	}
+	defer f.Close()
+	target := filepath.Join("./", global.CONFIG.Local.Path, time.Now().Format("200601"))
+	// 尝试创建此路径
+	mkdirErr := os.MkdirAll(target, os.ModePerm)
+	if mkdirErr != nil {
+		global.LOG.Error("function os.MkdirAll() Filed", zap.Any("err", mkdirErr.Error()))
+		return "", "", errors.New("function os.MkdirAll() Filed, err:" + mkdirErr.Error())
+	}
+	_, err = client.Object.Put(context.Background(), global.CONFIG.TencentCOS.PathPrefix+"/"+fileName+ext, f, nil)
+	if err != nil {
+		panic(err)
+	}
+	return global.CONFIG.TencentCOS.BaseURL + "/" + global.CONFIG.TencentCOS.PathPrefix + "/" + fileName + ext, fileName, nil
 }
 
 // DeleteFile delete file form COS
-func (*TencentCOS) DeleteFile(key string) error {
+func (*TencentCOS) DeleteFile(url string) error {
 	client := NewClient()
-	name := global.CONFIG.TencentCOS.PathPrefix + "/" + key
+	strs := strings.Split(url, "/")
+	name := global.CONFIG.TencentCOS.PathPrefix + "/" + strs[len(strs)-1]
 	_, err := client.Object.Delete(context.Background(), name)
 	if err != nil {
 		global.LOG.Error("function bucketManager.Delete() Filed", zap.Any("err", err.Error()))
