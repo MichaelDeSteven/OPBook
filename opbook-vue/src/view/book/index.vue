@@ -19,19 +19,226 @@
               <div class="help-block text-left" style="margin-top: 15px;">
                 <span class="text-danger">凡是违反国家法律法规或恶意发布的内容，本站有权在不提前告知的情况下对内容进行删除，请须知！</span>
               </div>
-              <ul class="nav nav-tabs" style="margin-top: 15px;">
-                <li class>
+              <!-- <ul class="nav nav-tabs" style="margin-top: 15px;">
+                <li :class="{'active':pub == 0}" @click="checkout(0)">
                   <a href>私有书籍</a>
                 </li>
-                <li class>
+                <li :class="{'active':pub != 0}" @click="checkout(1)">
                   <a href>公开书籍</a>
                 </li>
-              </ul>
+              </ul>-->
             </div>
             <div class="box-body" id="bookList">
               <div class="book-list">
-                <div class="text-center">暂无数据</div>
+                <template v-if="page.list.length < 1">
+                  <div class="text-center">暂无数据</div>
+                </template>
+                <template v-else>
+                  <form
+                    target="notarget"
+                    style="display: none;"
+                    action
+                    enctype="multipart/form-data"
+                    method="post"
+                    id="uploadZip"
+                  >
+                    <input type="file" name="zipfile" accept="application/zip" />
+                    <input type="text" name="identify" value />
+                  </form>
+                  <form
+                    target="notarget"
+                    style="display: none;"
+                    action
+                    enctype="multipart/form-data"
+                    method="post"
+                    id="uploadEpub"
+                  >
+                    <input type="file" name="zipfile" accept=".epub" />
+                    <input type="text" name="identify" value />
+                  </form>
+                  <div class="list-item clearfix" v-for="item in page.list">
+                    <div class="col-sm-2 col-xs-4" style="padding-left: 0px">
+                      <a class="recommend-book" title="查看文档" data-toggle="tooltip">
+                        <img
+                          onerror="this.src='/static/images/book.png'"
+                          class="img-responsive border-cover-img"
+                          src
+                          alt
+                        />
+                      </a>
+                    </div>
+                    <div class="col-sm-10 col-xs-8" style="padding-right: 0px;padding-left: 0px;">
+                      <div class="book-title">
+                        <div class="pull-left">
+                          <a href title="查看文档" data-toggle="tooltip">
+                            <i class="fa fa-unlock" aria-hidden="true"></i>
+                            {{ item.name }}
+                          </a>
+                        </div>
+
+                        <div class="clearfix"></div>
+                      </div>
+                      <div class="info hidden-xs">
+                        <span title="创建者" data-toggle="tooltip" data-placement="bottom">
+                          <i class="fa fa-user"></i>
+                          {{ item.user_id }}
+                        </span>
+                        <span title="文档数量" data-toggle="tooltip" data-placement="bottom">
+                          <i class="fa fa-pie-chart"></i>
+                          {{ item.doc_count }}
+                        </span>
+                        <!-- <span title="书籍角色" data-toggle="tooltip" data-placement="bottom">
+                          <i class="fa fa-user-secret"></i> role_name
+                        </span>-->
+                        <span title="创建时间" data-toggle="tooltip" data-placement="bottom">
+                          <i class="fa fa-clock-o"></i>
+                          {{ new Date(item.create_time).format("yyyy-MM-dd hh:mm:ss") }}
+                        </span>
+                        <span title="最后编辑" data-toggle="tooltip" data-placement="bottom">
+                          <i class="fa fa-pencil"></i>
+                          {{ new Date(item.modify_time).format("yyyy-MM-dd hh:mm:ss") }}
+                        </span>
+                      </div>
+                      <div class="desc-text">{{ item.description }}</div>
+                      <div class="btns">
+                        <a
+                          href
+                          title="查看文档"
+                          class="btn btn-default btn-sm"
+                          data-toggle="tooltip"
+                          target="_blank"
+                        >
+                          <i class="fa fa-eye"></i> 查看
+                          <span class="hidden-xs">文档</span>
+                        </a>
+                        <a
+                          href
+                          title="书籍设置"
+                          class="btn btn-default btn-sm"
+                          data-toggle="tooltip"
+                          target="_blank"
+                        >
+                          <i class="fa fa-cogs"></i>
+                          <span class="hidden-xs">书籍</span>设置
+                        </a>
+                        <a href class="btn btn-default btn-sm ajax-get confirm">
+                          <i class="fa fa-book"></i> 生成下载文档
+                        </a>
+                        <a href title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm">
+                          <i class="fa fa-edit" aria-hidden="true"></i> 编辑
+                          <span class="hidden-xs">文档</span>
+                        </a>
+                        <!-- Split button -->
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-default">
+                            <i class="fa fa-cloud-upload"></i> 导入书籍
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-default dropdown-toggle"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                          >
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li>
+                              <a
+                                href="javascript:void(0);"
+                                class="btn-upload-epub"
+                                data-toggle="tooltip"
+                                title="支持epub格式电子书导入。"
+                              >
+                                <i class="fa fa-cloud-upload"></i> EPUB 上传导入
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                href="javascript:void(0);"
+                                class="btn-upload-zip"
+                                data-toggle="tooltip"
+                                title="支持任意zip压缩的markdown书籍导入。"
+                              >
+                                <i class="fa fa-cloud-upload"></i> ZIP 上传导入
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                href="javascript:void(0);"
+                                class="btn-pull-by-zip"
+                                data-toggle="tooltip"
+                                title="从任意源拉取zip压缩的markdown书籍"
+                              >
+                                <i class="fa fa-link"></i> ZIP 拉取导入
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                href="javascript:void(0);"
+                                class="btn-pull-by-git"
+                                data-toggle="tooltip"
+                                title="从Git仓库导入markdown书籍"
+                              >
+                                <i class="fa fa-git"></i> Git Clone 导入
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
               </div>
+              <template v-if="page.list.length >= 0">
+                <nav class="pagination-container">
+                  <ul class="pagination">
+                    <li v-if="page.pageCurrent > 1">
+                      <a href="javascript:void(0);" @click="showPage(1)">..1</a>
+                    </li>
+                    <li v-if="page.pageCurrent > 1">
+                      <a href="javascript:void(0);" @click="showPage(page.pageCurrent - 1)">«</a>
+                    </li>
+                    <li class="active" v-if="page.pageCurrent >= 1">
+                      <a href="javascript:void(0);">{{ page.pageCurrent }}</a>
+                    </li>
+                    <li v-if="page.pageCurrent + 1 <= page.totalPage">
+                      <a
+                        href="javascript:void(0);"
+                        @click="showPage(page.pageCurrent + 1)"
+                      >{{ page.pageCurrent + 1 }}</a>
+                    </li>
+                    <li v-if="page.pageCurrent + 2 <= page.totalPage">
+                      <a
+                        href="javascript:void(0);"
+                        @click="showPage(page.pageCurrent + 2)"
+                      >{{ page.pageCurrent + 2 }}</a>
+                    </li>
+                    <li v-if="page.pageCurrent + 3 <= page.totalPage">
+                      <a
+                        href="javascript:void(0);"
+                        @click="showPage(page.pageCurrent + 3)"
+                      >{{ page.pageCurrent + 3 }}</a>
+                    </li>
+                    <li v-if="page.pageCurrent + 4 <= page.totalPage">
+                      <a
+                        href="javascript:void(0);"
+                        @click="showPage(page.pageCurrent + 4)"
+                      >{{ page.pageCurrent + 4 }}</a>
+                    </li>
+                    <li v-if="page.pageCurrent < page.totalPage">
+                      <a href="javascript:void(0);" @click="showPage(page.pageCurrent + 1)">»</a>
+                    </li>
+                    <li v-if="page.pageCurrent <= page.totalPage-5">
+                      <a
+                        href="javascript:void(0);"
+                        @click="showPage(page.totalPage)"
+                      >..{{ page.totalPage }}</a>
+                    </li>
+                  </ul>
+                </nav>
+              </template>
             </div>
           </div>
         </div>
@@ -181,13 +388,50 @@ export default {
         description: "",
         private: 0,
       },
+      pageReq: {
+        pageIndex: 1,
+        pageSize: 10,
+      },
+      page: {
+        totalCount: 0,
+        totalPage: 0,
+        pageCurrent: 1,
+        pageSize: 2,
+        list: [],
+      },
     };
+  },
+  created() {
+    this.Index(1, 2);
   },
   components: {
     Header,
     SettingMenu,
   },
   methods: {
+    showPage(nextPage) {
+      if (nextPage > this.page.totolPage) {
+        return;
+      }
+      this.Index(nextPage, 2);
+    },
+    Index(pageIndex, pageSize) {
+      this.pageReq.pageSize = pageSize;
+      this.pageReq.pageIndex = pageIndex;
+      service({
+        url: "/book/index",
+        method: "post",
+        data: this.pageReq,
+      }).then((res) => {
+        this.page.list = res.data.data.books;
+        this.page.totalCount = res.data.data.totalCount;
+        this.page.totalPage = Math.ceil(
+          this.page.totalCount / this.page.pageSize
+        );
+        this.page.pageCurrent = pageIndex;
+        console.log(this.page.totalPage);
+      });
+    },
     Create() {
       console.log(this.book);
       if (this.book.name === "") {

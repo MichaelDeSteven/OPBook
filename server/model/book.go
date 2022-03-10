@@ -61,3 +61,20 @@ func (b *Book) Add(book *Book) error {
 	tx := global.DB.Create(book)
 	return tx.Error
 }
+
+func (m *Book) HasProjectAccess(identify string, memberId int) bool {
+	return true
+}
+
+//分页查询指定用户的书籍
+//按照最新的进行排序
+func (m *Book) FindToPager(pageIndex, pageSize, userId int) (books []Book, totalCount int64, err error) {
+	var model Book
+	global.DB.Model(model).Where("is_deleted = ?", 0).Count(&totalCount)
+
+	offset := (pageIndex - 1) * pageSize
+
+	tx := global.DB.Order("id desc").Limit(pageSize).Offset(offset).Find(&books)
+	err = tx.Error
+	return
+}
