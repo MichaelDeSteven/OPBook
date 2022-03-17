@@ -13,4 +13,5 @@ func (s *BookRouter) InitBookRouter(r *rum.RouterGroup) {
 	bookRouter.Use(middleware.Recovery(true)).Use(middleware.DefaultLogger()).Use(middleware.JWTAuth())
 	bookRouter.POST("/create", controller.Create)
 	bookRouter.POST("/index", controller.Index)
+	bookRouter.POST("/upload", controller.UploadProject)
 }

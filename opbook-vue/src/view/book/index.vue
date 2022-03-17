@@ -144,7 +144,7 @@
                             <span class="sr-only">Toggle Dropdown</span>
                           </button>
                           <ul class="dropdown-menu">
-                            <li>
+                            <!-- <li>
                               <a
                                 href="javascript:void(0);"
                                 class="btn-upload-epub"
@@ -153,18 +153,19 @@
                               >
                                 <i class="fa fa-cloud-upload"></i> EPUB 上传导入
                               </a>
-                            </li>
+                            </li>-->
                             <li>
                               <a
                                 href="javascript:void(0);"
                                 class="btn-upload-zip"
                                 data-toggle="tooltip"
                                 title="支持任意zip压缩的markdown书籍导入。"
+                                @click="upload(item.identify)"
                               >
                                 <i class="fa fa-cloud-upload"></i> ZIP 上传导入
                               </a>
                             </li>
-                            <li>
+                            <!-- <li>
                               <a
                                 href="javascript:void(0);"
                                 class="btn-pull-by-zip"
@@ -173,8 +174,8 @@
                               >
                                 <i class="fa fa-link"></i> ZIP 拉取导入
                               </a>
-                            </li>
-                            <li>
+                            </li>-->
+                            <!-- <li>
                               <a
                                 href="javascript:void(0);"
                                 class="btn-pull-by-git"
@@ -183,7 +184,7 @@
                               >
                                 <i class="fa fa-git"></i> Git Clone 导入
                               </a>
-                            </li>
+                            </li>-->
                           </ul>
                         </div>
                       </div>
@@ -409,6 +410,36 @@ export default {
     SettingMenu,
   },
   methods: {
+    upload(identify) {
+      var form = $("form#uploadZip");
+      form.find("input[type=file]").trigger("click");
+      $("#uploadZip input[type=file]").change(function () {
+        var _this = $(this);
+        if (_this.val() && confirm("您确定要上传 " + _this.val() + " 吗？")) {
+          var formData = new FormData();
+          formData.append("zipfile", _this.get(0).files[0]);
+          formData.append("identify", identify);
+          service({
+            url: "/book/upload",
+            method: "post",
+            data: formData,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }).then((res) => {
+            console.log(res);
+            if (res.data.code === 0) {
+              alertTips("success", res.message, 3000, "");
+              setTimeout(() => {
+                location.reload();
+              }, 3000);
+            } else {
+              alertTips("error", res.message, 3000, "");
+            }
+          });
+        }
+      });
+    },
     showPage(nextPage) {
       if (nextPage > this.page.totolPage) {
         return;

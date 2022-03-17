@@ -110,3 +110,7 @@ func (*Local) UploadFileByPath(src string, fileName, ext string) (string, string
 	}
 	return dst, fileName + ext, nil
 }
+
+func (*Local) UploadFileByPrefix(src, target string) error {
+	return nil
+}

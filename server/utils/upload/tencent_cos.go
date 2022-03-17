@@ -58,6 +58,17 @@ func (*TencentCOS) UploadFileByPath(src string, fileName, ext string) (string, s
 	return global.CONFIG.TencentCOS.BaseURL + "/" + global.CONFIG.TencentCOS.PathPrefix + "/" + fileName + ext, fileName, nil
 }
 
+func (*TencentCOS) UploadFileByPrefix(src, target string) error {
+	client := NewClient()
+	f, err := os.OpenFile(src, os.O_SYNC|os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = client.Object.Put(context.Background(), src, f, nil)
+	return err
+}
+
 // DeleteFile delete file form COS
 func (*TencentCOS) DeleteFile(url string) error {
 	client := NewClient()

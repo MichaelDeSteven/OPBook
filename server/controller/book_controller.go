@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/MichaelDeSteven/OPBook/server/global"
 	"github.com/MichaelDeSteven/OPBook/server/model"
@@ -74,27 +77,28 @@ func UploadProject(c *rum.Context) {
 		return
 	}
 
-	// book, _ := model.NewBookResult().FindByIdentify(form.Identify, uid.(int))
-	// if book.BookId == 0 {
-	// 	response.FailWithMessage("书籍不存在", c)
-	// 	return
-	// }
+	book := model.NewBook().FindByIdentify(form.Identify)
+	if book.Id == 0 {
+		response.FailWithMessage("书籍不存在", c)
+		return
+	}
 
-	// f, h, err := this.GetFile("zipfile")
-	// if err != nil {
-	// 	this.JsonResult(1, err.Error())
-	// }
-	// defer f.Close()
-	// if strings.ToLower(filepath.Ext(h.Filename)) != ".zip" && strings.ToLower(filepath.Ext(h.Filename)) != ".epub" {
-	// 	this.JsonResult(1, "请上传指定格式文件")
-	// }
-	// tmpFile := "store/" + identify + ".zip" //保存的文件名
-	// if err := this.SaveToFile("zipfile", tmpFile); err == nil {
-	// 	go unzipToData(book.BookId, identify, tmpFile, h.Filename)
-	// } else {
-	// 	beego.Error(err.Error())
-	// }
-	// this.JsonResult(0, "上传成功")
+	h := form.Zip
+	if strings.ToLower(filepath.Ext(h.Filename)) != ".zip" {
+		response.FailWithMessage("请上传指定格式文件", c)
+		return
+	}
+	filePath := filepath.Join("./", global.CONFIG.Local.Path, "tmp", global.CONFIG.Local.Book, time.Now().Format("2006/01"), h.Filename)
+	path := filepath.Dir(filePath)
+	os.MkdirAll(path, os.ModePerm)
+	if err := c.SaveUploadedFile(h, filePath); err != nil {
+		global.LOG.Sugar().Errorf("保存文件失败: %+v\n", err)
+		response.FailWithMessage("保存文件失败", c)
+		return
+	} else {
+		go bookService.UnzipToData(book.Id, form.Identify, filePath, h.Filename)
+	}
+
 	response.OkWithMessage("上传成功", c)
 }
 

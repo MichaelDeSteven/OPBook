@@ -3,8 +3,10 @@ package utils
 import (
 	"errors"
 	"os"
+	"strings"
 
 	"github.com/MichaelDeSteven/OPBook/server/global"
+	"github.com/PuerkitoBio/goquery"
 	"go.uber.org/zap"
 )
 
@@ -37,4 +39,19 @@ func CreateDir(dirs ...string) (err error) {
 		}
 	}
 	return err
+}
+
+// 从md的html文件中提取文章标题（从h1-h6）
+func ParseTitleFromMdHtml(html string) (title string) {
+	hTag := []string{"h1", "h2", "h3", "h4", "h5", "h6"}
+	if doc, err := goquery.NewDocumentFromReader(strings.NewReader(html)); err == nil {
+		for _, tag := range hTag {
+			if title = strings.TrimSpace(doc.Find(tag).First().Text()); title != "" {
+				return title
+			}
+		}
+	} else {
+		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
+	return "空标题文档"
 }

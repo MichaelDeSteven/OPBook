@@ -10,6 +10,7 @@ import (
 type OSS interface {
 	UploadFile(file *multipart.FileHeader) (string, string, error)
 	UploadFileByPath(src string, fileName, ext string) (string, string, error)
+	UploadFileByPrefix(local, save string) error
 	DeleteFile(key string) error
 }
 

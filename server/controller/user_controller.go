@@ -190,6 +190,7 @@ func UploadAvatar(c *rum.Context) {
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
 		response.FailWithMessage("保存图片失败", c)
+		return
 	}
 
 	// 剪切图片
@@ -210,6 +211,7 @@ func UploadAvatar(c *rum.Context) {
 	if err != nil {
 		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
 		response.FailWithMessage("保存图片失败", c)
+		return
 	}
 
 	oss := upload.NewOss()

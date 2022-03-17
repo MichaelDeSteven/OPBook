@@ -45,6 +45,7 @@ func NewBook() *Book {
 	return &Book{}
 }
 
+// 根据书籍标识查询书籍.
 func (b *Book) FindByIdentify(identify string) (book *Book) {
 	global.DB.Where("is_deleted = ?", 0).Where("identify = ?", identify).First(&book)
 	return book
@@ -77,4 +78,14 @@ func (m *Book) FindToPager(pageIndex, pageSize, userId int) (books []Book, total
 	tx := global.DB.Order("id desc").Limit(pageSize).Offset(offset).Find(&books)
 	err = tx.Error
 	return
+}
+
+// 重置文档数量
+func (b *Book) ResetDocumentNumber(bookId int) {
+	d := NewDocument()
+	var totalCount int64
+	tx := global.DB.Model(d).Where("is_deleted = ?", 0).Where("book_id = ?", bookId).Count(&totalCount)
+	if err := tx.Error; err == nil {
+		global.DB.Model(&Book{}).Select("doc_count").Where("id", bookId)
+	}
 }
