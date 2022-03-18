@@ -58,3 +58,10 @@ func (this *DocumentStore) InsertOrUpdate(ds *DocumentStore, fields ...string) (
 	}
 	return
 }
+
+// 查询markdown内容或者content内容
+func (this *DocumentStore) GetById(docId int) (ds DocumentStore, err error) {
+	tx := global.DB.Where("document_id = ?", docId).Find(&ds)
+	err = tx.Error
+	return
+}

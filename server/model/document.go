@@ -1,10 +1,13 @@
 package model
 
 import (
+	"bytes"
 	"strings"
 	"time"
 
 	"github.com/MichaelDeSteven/OPBook/server/global"
+	"github.com/MichaelDeSteven/OPBook/server/utils"
+	"github.com/PuerkitoBio/goquery"
 )
 
 type Document struct {
@@ -57,4 +60,45 @@ func (d *Document) InsertOrUpdate() (id int, err error) {
 		err = tx.Error
 	}
 	return
+}
+
+// 发布文档内容为HTML
+func (d *Document) ReleaseContent(bookId int) {
+	// 加锁
+	utils.BooksRelease.Set(bookId)
+	defer utils.BooksRelease.Delete(bookId)
+
+	var (
+		// releaseTime = time.Now() // 发布的时间戳
+		book       = NewBook()
+		docs       []Document
+		ModelStore = NewDocumentStore()
+	)
+	global.DB.Where("is_deleted = ?", 0).Where("id = ?", bookId).First(&book)
+
+	// 全部重新发布。查询该书籍的所有文档id
+	global.DB.Select("id", "identify", "modify_time").Where("book_id = ?", bookId).Where("is_deleted = ?", 0).Find(&docs)
+
+	docMap := make(map[string]bool)
+	for _, item := range docs {
+		docMap[item.Identify] = true
+	}
+	for _, item := range docs {
+		ds, err := ModelStore.GetById(item.Id)
+		if err != nil {
+			global.LOG.Sugar().Error(err)
+			continue
+		}
+
+		if item.Release = strings.TrimSpace(ds.Content); !utils.Empty(item.Release) {
+			if docQuery, err := goquery.NewDocumentFromReader(bytes.NewBufferString(item.Release)); err == nil {
+				if html, err := docQuery.Html(); err == nil {
+					item.Release = strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(html), "<html><head></head><body>"), "</body></html>")
+				}
+			}
+		}
+		if _, err = item.InsertOrUpdate(); err != nil {
+			global.LOG.Sugar().Error(err)
+		}
+	}
 }

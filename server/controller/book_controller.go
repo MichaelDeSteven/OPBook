@@ -117,3 +117,13 @@ func Index(c *rum.Context) {
 	data["totalCount"] = totalCount
 	response.OkWithData(data, c)
 }
+
+//发布书籍.
+func Release(c *rum.Context) {
+	bookId, err := strconv.Atoi(c.Param("bookId"))
+	if err != nil {
+		response.FailWithMessage("bookId应该为数字", c)
+		return
+	}
+	model.NewDocument().ReleaseContent(bookId)
+}

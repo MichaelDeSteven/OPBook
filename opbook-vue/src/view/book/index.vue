@@ -121,8 +121,12 @@
                           <i class="fa fa-cogs"></i>
                           <span class="hidden-xs">书籍</span>设置
                         </a>
-                        <a href class="btn btn-default btn-sm ajax-get confirm">
-                          <i class="fa fa-book"></i> 生成下载文档
+                        <a
+                          href
+                          class="btn btn-default btn-sm ajax-get confirm"
+                          @click="release(item.id)"
+                        >
+                          <i class="fa fa-book"></i> 发布书籍
                         </a>
                         <a href title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm">
                           <i class="fa fa-edit" aria-hidden="true"></i> 编辑
@@ -382,6 +386,7 @@ export default {
   data() {
     return {
       book: {
+        id: "",
         name: "",
         identify: "",
         author: "",
@@ -410,6 +415,14 @@ export default {
     SettingMenu,
   },
   methods: {
+    release(bookId) {
+      service({
+        url: "/book/release/" + bookId,
+        method: "post",
+      }).then((res) => {
+        console.log(res);
+      });
+    },
     upload(identify) {
       var form = $("form#uploadZip");
       form.find("input[type=file]").trigger("click");

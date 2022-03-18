@@ -112,7 +112,8 @@ func (bookservice *BookService) UnzipToData(bookId int, identify, zipFile, origi
 						if docId, err := doc.InsertOrUpdate(); err == nil {
 							if err := modelStore.InsertOrUpdate(&model.DocumentStore{
 								DocumentId: docId,
-								Markdown:   mdcont}, "markdown"); err != nil {
+								Markdown:   mdcont,
+								Content:    mdtil.Md2html(mdcont)}, "markdown", "content"); err != nil {
 								global.LOG.Sugar().Errorf("err:%+v\n", err)
 							}
 						} else {
@@ -143,7 +144,7 @@ func getProjectRoot(fl []filetil.FileList) (root string) {
 
 // 查找并替换markdown文件中的路径，把图片链接替换成url的相对路径，把文档间的链接替换成【$+文档标识链接】
 func replaceToAbs(projectRoot string, identify string) {
-	imgBaseUrl := "/uploads/projects/" + identify
+	imgBaseUrl := global.CONFIG.TencentCOS.BaseURL
 	files, _ := filetil.ScanFiles(projectRoot)
 	for _, file := range files {
 		if ext := strings.ToLower(filepath.Ext(file.Path)); ext == ".md" || ext == ".markdown" {
