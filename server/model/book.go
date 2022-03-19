@@ -89,3 +89,15 @@ func (b *Book) ResetDocumentNumber(bookId int) {
 		global.DB.Model(&Book{}).Select("doc_count").Where("id", bookId)
 	}
 }
+
+func (b *Book) Get(identify string) (book *Book, err error) {
+	tx := global.DB.Omit("release").Where("is_deleted = ?", 0).Where("identify = ?", identify).Find(&book)
+	err = tx.Error
+	return
+}
+
+// 根据书籍标识查询书籍Id.
+func (b *Book) FindIdByIdentify(identify string) (bookId int) {
+	global.DB.Select("id").Where("is_deleted = ?", 0).Where("identify = ?", identify).First(&b)
+	return b.Id
+}

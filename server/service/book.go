@@ -210,3 +210,12 @@ func replaceToAbs(projectRoot string, identify string) {
 		}
 	}
 }
+
+func (bookservice *BookService) GetBookIntroduct(identify string) *model.Book {
+	book, err := model.NewBook().Get(identify)
+	if err != nil {
+		global.LOG.Sugar().Error(err)
+		return nil
+	}
+	return book
+}

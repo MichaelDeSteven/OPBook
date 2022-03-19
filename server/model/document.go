@@ -102,3 +102,18 @@ func (d *Document) ReleaseContent(bookId int) {
 		}
 	}
 }
+
+// 根据书籍ID查询文档一级目录.
+func (m *Document) GetMenuTop(bookId int) (docs []*Document) {
+	var docsAll []*Document
+	cols := []string{"id", "name", "parent_id", "book_id", "identify"}
+	global.DB.Select(cols).Where("book_id = ?", bookId).Where("is_deleted = ?", 0).Where("parent_id = ?", 0).Order("order_sort, id").Limit(5000).Find(&docsAll)
+
+	// 以"."开头的文档标识，不在阅读目录显示
+	for _, doc := range docsAll {
+		if !strings.HasPrefix(doc.Identify, ".") {
+			docs = append(docs, doc)
+		}
+	}
+	return
+}

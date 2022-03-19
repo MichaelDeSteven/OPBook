@@ -127,3 +127,14 @@ func Release(c *rum.Context) {
 	}
 	model.NewDocument().ReleaseContent(bookId)
 }
+
+// 书籍概要
+func Introduct(c *rum.Context) {
+	identify := c.Param("identify")
+	if utils.Empty(identify) {
+		response.FailWithMessage("identify为空", c)
+		return
+	}
+	book := bookService.GetBookIntroduct(identify)
+	response.OkWithData(book, c)
+}

@@ -9,6 +9,7 @@ import Login from '@/view/login/login'
 import Setting from '@/view/user/setting'
 import Password from '@/view/user/password'
 import BookIndex from '@/view/book/index'
+import Intro from '@/view/book/intro'
 
 Vue.use(Router)
 
@@ -59,6 +60,11 @@ export default new Router({
         path: '/book',
         name: 'BookIndex',
         component: BookIndex
+    },
+    {
+        path: '/introduct/:identify',
+        name: 'Intro',
+        component: Intro
     }
   ]
 })
