@@ -117,3 +117,13 @@ func (m *Document) GetMenuTop(bookId int) (docs []*Document) {
 	}
 	return
 }
+
+func (d *Document) Get(bookId int, docIdentify string) (doc *Document) {
+	global.DB.Where("book_id = ?", bookId).Where("is_deleted = ?", 0).Where("identify = ?", docIdentify).First(&doc)
+	return
+}
+
+func (d *Document) getDocsByBookId(bookId int, fields ...string) (docs []*Document) {
+	global.DB.Model(d).Select(fields).Where("is_deleted = ?", 0).Where("book_id", bookId).Order("order_sort, identify").Limit(5000).Find(&docs)
+	return
+}

@@ -32,7 +32,7 @@ export default new Router({
       component: UserFans
     },
     {
-      path: '/read',
+      path: '/read/:book_identify/:doc_identify',
       name: 'Read',
       component: Read
     },

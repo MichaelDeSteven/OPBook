@@ -96,8 +96,20 @@ func (b *Book) Get(identify string) (book *Book, err error) {
 	return
 }
 
+func (b *Book) GetById(bookId int) (book *Book, err error) {
+	tx := global.DB.Omit("release").Where("is_deleted = ?", 0).Where("id = ?", bookId).Find(&book)
+	err = tx.Error
+	return
+}
+
 // 根据书籍标识查询书籍Id.
 func (b *Book) FindIdByIdentify(identify string) (bookId int) {
 	global.DB.Select("id").Where("is_deleted = ?", 0).Where("identify = ?", identify).First(&b)
 	return b.Id
+}
+
+// 根据书籍标识查询书籍相关列信息
+func (b *Book) FindColsByIdentify(identify string, cols ...string) *Book {
+	global.DB.Select(cols).Where("is_deleted = ?", 0).Where("identify = ?", identify).First(&b)
+	return b
 }

@@ -90,7 +90,7 @@
             <ul class="none-listyle">
               <li v-for="item in menuTop" :key="item.id">
                 <a
-                  :href="'read/' + book.name + '/' + item.identify"
+                  :href="'/read/' + book.name + '/' + item.identify"
                   target="_blank"
                   :title="item.name"
                 >{{ item.name }}</a>

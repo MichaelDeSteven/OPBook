@@ -85,9 +85,9 @@ func (bookservice *BookService) UnzipToData(bookId int, identify, zipFile, origi
 							htmlStr = string(b)
 							mdcont = html2md.Convert(htmlStr)
 						}
-						if !strings.HasPrefix(mdcont, "[TOC]") {
-							mdcont = "[TOC]\r\n\r\n" + mdcont
-						}
+						// if !strings.HasPrefix(mdcont, "[TOC]") {
+						// 	mdcont = "[TOC]\r\n\r\n" + mdcont
+						// }
 						doc.Name = utils.ParseTitleFromMdHtml(htmlStr)
 						doc.BookId = bookId
 						doc.Identify = strings.Replace(strings.Trim(strings.TrimPrefix(file.Path, ""), "/"), "/", "-", -1)

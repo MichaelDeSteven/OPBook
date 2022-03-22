@@ -13,4 +13,5 @@ func (s *DocumentRouter) InitDocumentRouter(r *rum.RouterGroup) {
 	documentRouter := r.Group("document")
 	documentRouter.Use(middleware.Recovery(true)).Use(middleware.DefaultLogger()).Use(middleware.JWTAuth())
 	documentRouter.GET("/index/:identify", docController.Index)
+	documentRouter.GET("/read/:book_identify/:doc_identify", docController.Read)
 }
