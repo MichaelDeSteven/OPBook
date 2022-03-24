@@ -113,3 +113,9 @@ func (b *Book) FindColsByIdentify(identify string, cols ...string) *Book {
 	global.DB.Select(cols).Where("is_deleted = ?", 0).Where("identify = ?", identify).First(&b)
 	return b
 }
+
+func (b *Book) GetBooksById(id []int) (books []*Book, err error) {
+	tx := global.DB.Omit("release").Where("is_deleted = ?", 0).Where("id in ?", id).Find(&books)
+	err = tx.Error
+	return
+}

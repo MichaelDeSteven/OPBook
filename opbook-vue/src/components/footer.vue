@@ -1,6 +1,6 @@
 <template>
   <div class="footer">
-    <div class="container">
+    <div class="container-fluid container-widescreen">
       <div class="row">
         <div class="clearfix mgt-15px text-center">
           <div class="col-xs-12 mgt-15px">

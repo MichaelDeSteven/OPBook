@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/MichaelDeSteven/OPBook/server/controller"
 	"github.com/MichaelDeSteven/OPBook/server/global"
 	"github.com/MichaelDeSteven/OPBook/server/middleware"
 	"github.com/MichaelDeSteven/rum"
@@ -20,5 +21,8 @@ func (s *BaseRouter) InitBaseRouter(r *rum.RouterGroup) {
 		urlPattern := path.Join(relativePath, "/*filepath")
 		r.GET(urlPattern, handler)
 	}
+
+	searchController := controller.SearchController{}
+	r.POST("/search", searchController.Result)
 
 }

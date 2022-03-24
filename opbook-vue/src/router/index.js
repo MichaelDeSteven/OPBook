@@ -10,6 +10,8 @@ import Setting from '@/view/user/setting'
 import Password from '@/view/user/password'
 import BookIndex from '@/view/book/index'
 import Intro from '@/view/book/intro'
+import Search from '@/view/search/search'
+import SearchResult from '@/view/search/result'
 
 Vue.use(Router)
 
@@ -65,6 +67,16 @@ export default new Router({
         path: '/introduct/:identify',
         name: 'Intro',
         component: Intro
+    },
+    {
+        path: '/search',
+        name: 'Search',
+        component: Search
+    },
+    {
+        path: '/search/result',
+        name: 'SearchResult',
+        component: SearchResult
     }
   ]
 })

@@ -101,6 +101,9 @@ func (d *Document) ReleaseContent(bookId int) {
 			global.LOG.Sugar().Error(err)
 		}
 	}
+
+	client := NewElasticSearchClient()
+	client.RebuildAllIndex(bookId)
 }
 
 // 根据书籍ID查询文档一级目录.
@@ -125,5 +128,15 @@ func (d *Document) Get(bookId int, docIdentify string) (doc *Document) {
 
 func (d *Document) getDocsByBookId(bookId int, fields ...string) (docs []*Document) {
 	global.DB.Model(d).Select(fields).Where("is_deleted = ?", 0).Where("book_id", bookId).Order("order_sort, identify").Limit(5000).Find(&docs)
+	return
+}
+
+//分页查询文档
+func (m *Document) FindToPager(pageIndex, pageSize, bookId int, fields ...string) (docs []*Document, err error) {
+
+	offset := (pageIndex - 1) * pageSize
+
+	tx := global.DB.Select(fields).Limit(pageSize).Offset(offset).Find(&docs)
+	err = tx.Error
 	return
 }
