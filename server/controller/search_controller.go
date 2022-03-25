@@ -20,7 +20,6 @@ func (this *SearchController) Result(c *rum.Context) {
 	if req.PageIndex < 1 {
 		req.PageIndex = 1
 	}
-	req.PageSize = 10
 	now := time.Now()
 
 	client := model.NewElasticSearchClient()

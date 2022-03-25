@@ -40,7 +40,7 @@
           </ul>
           <ul :class="{'doc-result':tab==1}">
             <div v-show="tab == 0">
-              <template v-if="res.books != null && res.books.length < 1">
+              <template v-if="page.books != null && page.books.length < 1">
                 <li class="clearfix">
                   <div class="help-block">
                     啊哦，没搜到相关书籍，
@@ -49,7 +49,7 @@
                 </li>
               </template>
               <template v-else>
-                <li class="clearfix" v-for="book in res.books">
+                <li class="clearfix" v-for="book in page.books">
                   <div class="col-sm-3 col-md-3 col-lg-2 col-xs-3" style="padding: 0px;">
                     <a :href="'/introduct/' + book.identify" target="_blank">
                       <img
@@ -87,15 +87,15 @@
               </template>
             </div>
             <div v-show="tab == 1">
-              <template v-if="res.docs != null && res.docs.length < 1">
+              <template v-if="page.docs != null && page.docs.length < 1">
                 <li class="clearfix">
                   <div class="help-block">很遗憾，没搜到相关文档，建议您更换关键字重新搜索</div>
                 </li>
               </template>
               <template v-else>
-                <li class="clearfix" v-for="doc in res.docs">
+                <li class="clearfix" v-for="doc in page.docs">
                   <div class="col-xs-12">
-                    <a href target="_blank">
+                    <a :href="'/read/' + doc.book_identify + '/' + doc.identify" target="_blank">
                       <h4>{{doc.doc_name}}</h4>
                     </a>
                     <div class="text-muted book-info">
@@ -108,7 +108,12 @@
                         {{ new Date(doc.create_time).format("yyyy-MM-dd hh:mm:ss") }}
                       </span>
                       <span>
-                        <a href target="_blank" class="tooltips" title="查看书籍">
+                        <a
+                          :href="'/introduct/' + doc.book_identify"
+                          target="_blank"
+                          class="tooltips"
+                          title="查看书籍"
+                        >
                           <i class="fa fa-book text-muted"></i>
                           《{{doc.book_name}}》
                         </a>
@@ -120,6 +125,11 @@
               </template>
             </div>
           </ul>
+          <template
+            v-if="(page.books != null && page.books.length > 0) || (page.docs != null && page.docs.length > 0)"
+          >
+            <my-pagination :pageSize="page.size" :count="page.totalCount" @pageEvent="showPage" />
+          </template>
         </div>
       </div>
     </div>
@@ -132,6 +142,7 @@
 import Header from "@/components/header.vue";
 import Footer from "@/components/footer.vue";
 import service from "@/utils/request";
+import myPagination from "@/components/page";
 export default {
   name: "SearchResult",
   data() {
@@ -147,11 +158,15 @@ export default {
         isSearchDoc: 0,
         books: [],
         docs: [],
-        spendTime: "",
+        spendTime: "0",
         totalRows: 0,
       },
-      books: [],
-      docs: [],
+      page: {
+        totalCount: 0,
+        size: 2,
+        books: [],
+        docs: [],
+      },
       tab: 0,
     };
   },
@@ -164,12 +179,21 @@ export default {
   components: {
     Header,
     Footer,
+    myPagination,
   },
   methods: {
     getParams() {
       // 取到路由带过来的参数
       const wd = this.$route.query.wd; // 将数据放在当前组件的数据内
       this.req.wd = wd;
+      this.getResult();
+    },
+    showPage(nextPage) {
+      if (nextPage > this.page.totolPage) {
+        return;
+      }
+      this.req.pageSize = this.page.size;
+      this.req.pageIndex = nextPage;
       this.getResult();
     },
     getResult() {
@@ -184,6 +208,14 @@ export default {
         console.log(res);
         if (res.data.code === 0) {
           this.res = res.data.data;
+          this.page.totalCount = this.res.totalRows;
+          if (this.res.isSearchDoc) {
+            this.page.docs = this.res.docs;
+            this.page.books = null;
+          } else {
+            this.page.books = this.res.books;
+            this.page.docs = null;
+          }
         } else {
         }
       });
@@ -192,6 +224,8 @@ export default {
       if (this.tab === inx) return;
       this.tab = inx;
       this.req.isSearchDoc = this.tab == 1 ? true : false;
+      this.req.pageSize = this.page.size;
+      this.req.pageIndex = 1;
       this.getResult();
     },
   },

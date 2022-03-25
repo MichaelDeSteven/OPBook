@@ -196,53 +196,12 @@
                   </div>
                 </template>
               </div>
-              <template v-if="page.list.length >= 0">
-                <nav class="pagination-container">
-                  <ul class="pagination">
-                    <li v-if="page.pageCurrent > 1">
-                      <a href="javascript:void(0);" @click="showPage(1)">..1</a>
-                    </li>
-                    <li v-if="page.pageCurrent > 1">
-                      <a href="javascript:void(0);" @click="showPage(page.pageCurrent - 1)">«</a>
-                    </li>
-                    <li class="active" v-if="page.pageCurrent >= 1">
-                      <a href="javascript:void(0);">{{ page.pageCurrent }}</a>
-                    </li>
-                    <li v-if="page.pageCurrent + 1 <= page.totalPage">
-                      <a
-                        href="javascript:void(0);"
-                        @click="showPage(page.pageCurrent + 1)"
-                      >{{ page.pageCurrent + 1 }}</a>
-                    </li>
-                    <li v-if="page.pageCurrent + 2 <= page.totalPage">
-                      <a
-                        href="javascript:void(0);"
-                        @click="showPage(page.pageCurrent + 2)"
-                      >{{ page.pageCurrent + 2 }}</a>
-                    </li>
-                    <li v-if="page.pageCurrent + 3 <= page.totalPage">
-                      <a
-                        href="javascript:void(0);"
-                        @click="showPage(page.pageCurrent + 3)"
-                      >{{ page.pageCurrent + 3 }}</a>
-                    </li>
-                    <li v-if="page.pageCurrent + 4 <= page.totalPage">
-                      <a
-                        href="javascript:void(0);"
-                        @click="showPage(page.pageCurrent + 4)"
-                      >{{ page.pageCurrent + 4 }}</a>
-                    </li>
-                    <li v-if="page.pageCurrent < page.totalPage">
-                      <a href="javascript:void(0);" @click="showPage(page.pageCurrent + 1)">»</a>
-                    </li>
-                    <li v-if="page.pageCurrent <= page.totalPage-5">
-                      <a
-                        href="javascript:void(0);"
-                        @click="showPage(page.totalPage)"
-                      >..{{ page.totalPage }}</a>
-                    </li>
-                  </ul>
-                </nav>
+              <template v-if="page.list.length > 0">
+                <my-pagination
+                  :pageSize="page.size"
+                  :count="page.totalCount"
+                  @pageEvent="showPage"
+                />
               </template>
             </div>
           </div>
@@ -381,6 +340,7 @@
 import Header from "@/components/header.vue";
 import SettingMenu from "@/components/user/menu.vue";
 import service from "@/utils/request";
+import myPagination from "@/components/page";
 export default {
   name: "BookIndex",
   data() {
@@ -400,19 +360,18 @@ export default {
       },
       page: {
         totalCount: 0,
-        totalPage: 0,
-        pageCurrent: 1,
-        pageSize: 2,
+        size: 10,
         list: [],
       },
     };
   },
   created() {
-    this.Index(1, 2);
+    this.Index(1);
   },
   components: {
     Header,
     SettingMenu,
+    myPagination,
   },
   methods: {
     release(bookId) {
@@ -457,11 +416,11 @@ export default {
       if (nextPage > this.page.totolPage) {
         return;
       }
-      this.Index(nextPage, 2);
+      this.Index(nextPage);
     },
-    Index(pageIndex, pageSize) {
-      this.pageReq.pageSize = pageSize;
+    Index(pageIndex) {
       this.pageReq.pageIndex = pageIndex;
+      this.pageReq.pageSize = this.page.size;
       service({
         url: "/book/index",
         method: "post",
@@ -469,11 +428,6 @@ export default {
       }).then((res) => {
         this.page.list = res.data.data.books;
         this.page.totalCount = res.data.data.totalCount;
-        this.page.totalPage = Math.ceil(
-          this.page.totalCount / this.page.pageSize
-        );
-        this.page.pageCurrent = pageIndex;
-        console.log(this.page.totalPage);
       });
     },
     Create() {
