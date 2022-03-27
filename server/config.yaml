@@ -75,3 +75,9 @@ tencent-cos:
   secret-key: "0pOjqhV9apvxwhBcw2e06TbUJ3atSlT4"
   base-url: "https://opbook-1304588036.cos.ap-hongkong.myqcloud.com"
   path-prefix: "file"
+
+# redis configuration
+redis:
+  db: 1
+  addr: "127.0.0.1:6379"
+  password: ""
