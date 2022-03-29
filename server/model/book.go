@@ -119,3 +119,13 @@ func (b *Book) GetBooksById(id []int) (books []*Book, err error) {
 	err = tx.Error
 	return
 }
+
+func (b *Book) GetBookView(bookId int) int {
+	var model Book
+	global.DB.Select("view_count").Where("is_deleted = ?", 0).Where("id = ?", bookId).Find(&model)
+	return model.ViewCount
+}
+
+func (b *Book) SetBookView(bookId int, viewCount int) {
+	global.DB.Update("view_count", viewCount).Where("is_deleted = ?", 0).Where("id = ?", bookId)
+}

@@ -78,6 +78,6 @@ tencent-cos:
 
 # redis configuration
 redis:
-  db: 1
-  addr: "127.0.0.1:6379"
-  password: ""
+  db: 0
+  addr: "110.42.176.87:6379"
+  password: "123456"

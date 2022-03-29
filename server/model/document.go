@@ -140,3 +140,13 @@ func (m *Document) FindToPager(pageIndex, pageSize, bookId int, fields ...string
 	err = tx.Error
 	return
 }
+
+func (d *Document) GetDocumentView(docId int) int {
+	var model Book
+	global.DB.Select("view_count").Where("is_deleted = ?", 0).Where("id = ?", docId).Find(&model)
+	return model.ViewCount
+}
+
+func (d *Document) SetDocumentView(docId int, viewCount int) {
+	global.DB.Update("view_count", viewCount).Where("is_deleted = ?", 0).Where("id = ?", docId)
+}

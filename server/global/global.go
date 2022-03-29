@@ -2,7 +2,7 @@ package global
 
 import (
 	"github.com/MichaelDeSteven/OPBook/server/config"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"golang.org/x/sync/singleflight"

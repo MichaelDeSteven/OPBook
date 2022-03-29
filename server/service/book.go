@@ -1,7 +1,9 @@
 package service
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/url"
 	"os"
@@ -18,6 +20,7 @@ import (
 	"github.com/TruthHun/gotil/filetil"
 	"github.com/TruthHun/gotil/mdtil"
 	"github.com/TruthHun/gotil/ziptil"
+	"github.com/go-redis/redis/v8"
 	"github.com/russross/blackfriday"
 )
 
@@ -211,11 +214,58 @@ func replaceToAbs(projectRoot string, identify string) {
 	}
 }
 
+// 获取书籍概括
 func (bookservice *BookService) GetBookIntroduct(identify string) *model.Book {
 	book, err := model.NewBook().Get(identify)
 	if err != nil {
 		global.LOG.Sugar().Error(err)
 		return nil
 	}
+	increaseBookView(book.Id)
 	return book
+}
+
+// 在线阅读
+func (bookservice *BookService) Read(bookIdentify, docIdentify string) (map[string]interface{}, error) {
+	book := model.NewBook().FindColsByIdentify(bookIdentify, "id", "author", "author_url", "name")
+	doc := model.NewDocument().Get(book.Id, docIdentify)
+	if doc == nil || doc.Id == 0 {
+		global.LOG.Sugar().Errorf("目标文档不存在")
+		return nil, errors.New("目标文档不存在")
+	}
+	data := make(map[string]interface{}, 3)
+	data["doc"] = doc
+	tree, err := model.NewDocument().CreateDocumentTreeForHtml(doc.BookId, doc.Id)
+	if err != nil {
+		global.LOG.Sugar().Errorf("获取书籍目录失败：%+v", err)
+		return nil, err
+	}
+	data["menu"] = tree
+	data["book"] = book
+	increaseDocView(doc.Id)
+	return data, nil
+}
+
+func increaseBookView(bookId int) {
+	key := utils.BOOK_VIEW_COUNT_PREFIX + fmt.Sprint(bookId)
+	val, err := global.REDIS.Get(context.Background(), key).Int()
+	if err == nil {
+		global.REDIS.Set(context.Background(), key, val+1, 0)
+	} else if err == redis.Nil {
+		global.REDIS.Set(context.Background(), key, model.NewBook().GetBookView(bookId)+1, 0)
+	} else {
+		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
+}
+
+func increaseDocView(docId int) {
+	key := utils.DOC_VIEW_COUNT_PREFIX + fmt.Sprint(docId)
+	val, err := global.REDIS.Get(context.Background(), key).Int()
+	if err == nil {
+		global.REDIS.Set(context.Background(), key, val+1, 0)
+	} else if err == redis.Nil {
+		global.REDIS.Set(context.Background(), key, model.NewDocument().GetDocumentView(docId)+1, 0)
+	} else {
+		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
 }

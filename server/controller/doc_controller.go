@@ -34,20 +34,10 @@ func (this *DocumentController) Read(c *rum.Context) {
 		response.FailWithMessage("identify为空", c)
 		return
 	}
-	book := model.NewBook().FindColsByIdentify(bookIdentify, "id", "author", "author_url", "name")
-	doc := model.NewDocument().Get(book.Id, docIdentify)
-	if doc == nil || doc.Id == 0 {
-		response.FailWithMessage("目标文档不存在", c)
-		return
-	}
-	data := make(map[string]interface{})
-	data["doc"] = doc
-	tree, err := model.NewDocument().CreateDocumentTreeForHtml(doc.BookId, doc.Id)
+	data, err := bookService.Read(bookIdentify, docIdentify)
 	if err != nil {
-		response.FailWithMessage("获取书籍目录失败", c)
+		response.FailWithError(err, c)
 		return
 	}
-	data["menu"] = tree
-	data["book"] = book
 	response.OkWithData(data, c)
 }
