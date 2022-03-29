@@ -5,7 +5,7 @@ import (
 	"github.com/MichaelDeSteven/OPBook/server/service"
 )
 
-func Timer() {
+func initTimer() {
 	if global.CONFIG.Timer.Start {
 		go func() {
 			global.Timer.AddTaskByFunc("BOOK_VIEW_COUNT", global.CONFIG.Timer.Spec, service.UpdateBooksView)

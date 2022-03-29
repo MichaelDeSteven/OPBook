@@ -5,7 +5,7 @@ import (
 	"github.com/MichaelDeSteven/rum"
 )
 
-func Routers() *rum.Engine {
+func initRouters() *rum.Engine {
 	r := rum.Default()
 	PublicGroup := r.Group("")
 	base := router.BaseRouter{}

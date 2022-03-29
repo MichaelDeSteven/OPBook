@@ -1,4 +1,4 @@
-package core
+package initialize
 
 import (
 	"flag"
@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Viper(path ...string) *viper.Viper {
+func initViper(path ...string) {
 	var config string
 	if len(path) == 0 {
 		flag.StringVar(&config, "c", "", "choose config file.")
@@ -50,5 +50,5 @@ func Viper(path ...string) *viper.Viper {
 	if err := v.Unmarshal(&global.CONFIG); err != nil {
 		fmt.Println(err)
 	}
-	return v
+	global.VP = v
 }

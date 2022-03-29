@@ -1,4 +1,4 @@
-package core
+package initialize
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func Zap() (logger *zap.Logger) {
+func initLog() {
 	if ok, _ := utils.PathExists(global.CONFIG.Zap.Director); !ok { // 判断是否有Director文件夹
 		fmt.Printf("create %v directory\n", global.CONFIG.Zap.Director)
 		_ = os.Mkdir(global.CONFIG.Zap.Director, os.ModePerm)
@@ -39,12 +39,11 @@ func Zap() (logger *zap.Logger) {
 		getEncoderCore(fmt.Sprintf("./%s/server_warn.log", global.CONFIG.Zap.Director), warnPriority),
 		getEncoderCore(fmt.Sprintf("./%s/server_error.log", global.CONFIG.Zap.Director), errorPriority),
 	}
-	logger = zap.New(zapcore.NewTee(cores[:]...), zap.AddCaller())
+	global.LOG = zap.New(zapcore.NewTee(cores[:]...), zap.AddCaller())
 
 	if global.CONFIG.Zap.ShowLine {
-		logger = logger.WithOptions(zap.AddCaller())
+		global.LOG = global.LOG.WithOptions(zap.AddCaller())
 	}
-	return logger
 }
 
 // getEncoderConfig 获取zapcore.EncoderConfig

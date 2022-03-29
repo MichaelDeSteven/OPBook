@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/MichaelDeSteven/OPBook/server/global"
-	"github.com/MichaelDeSteven/OPBook/server/graphics"
 	"github.com/MichaelDeSteven/OPBook/server/model"
 	"github.com/MichaelDeSteven/OPBook/server/model/response"
 	"github.com/MichaelDeSteven/OPBook/server/model/system/request"
 	"github.com/MichaelDeSteven/OPBook/server/utils"
+	"github.com/MichaelDeSteven/OPBook/server/utils/graphics"
 	"github.com/MichaelDeSteven/OPBook/server/utils/upload"
 	"github.com/MichaelDeSteven/rum"
 )
