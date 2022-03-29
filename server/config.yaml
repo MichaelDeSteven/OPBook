@@ -81,3 +81,8 @@ redis:
   db: 0
   addr: "110.42.176.87:6379"
   password: "123456"
+
+# timer task update db table
+Timer:
+  start: true
+  spec: "@every 10m"

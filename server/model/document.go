@@ -148,5 +148,5 @@ func (d *Document) GetDocumentView(docId int) int {
 }
 
 func (d *Document) SetDocumentView(docId int, viewCount int) {
-	global.DB.Update("view_count", viewCount).Where("is_deleted = ?", 0).Where("id = ?", docId)
+	global.DB.Model(d).Where("is_deleted = ?", 0).Where("id = ?", docId).Update("view_count", viewCount)
 }

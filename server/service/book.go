@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -267,5 +268,28 @@ func increaseDocView(docId int) {
 		global.REDIS.Set(context.Background(), key, model.NewDocument().GetDocumentView(docId)+1, 0)
 	} else {
 		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
+}
+
+func UpdateBooksView() {
+	book := model.NewBook()
+	set, _ := global.REDIS.Keys(context.Background(), utils.BOOK_VIEW_COUNT_PREFIX+"*").Result()
+	for _, val := range set {
+		ss := strings.Split(val, "_")
+		bookId, _ := strconv.Atoi(ss[len(ss)-1])
+		viewCount, _ := global.REDIS.Get(context.Background(), val).Int()
+		global.LOG.Sugar().Infof("%+v %v\n", bookId, viewCount)
+		book.SetBookView(bookId, viewCount)
+	}
+}
+
+func UpdateDocsView() {
+	doc := model.NewDocument()
+	set, _ := global.REDIS.Keys(context.Background(), utils.DOC_VIEW_COUNT_PREFIX+"*").Result()
+	for _, val := range set {
+		ss := strings.Split(val, "_")
+		docId, _ := strconv.Atoi(ss[len(ss)-1])
+		viewCount, _ := global.REDIS.Get(context.Background(), val).Int()
+		doc.SetDocumentView(docId, viewCount)
 	}
 }

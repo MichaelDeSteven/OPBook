@@ -10,6 +10,7 @@ func main() {
 	global.VP = core.Viper()      // 初始化Viper
 	global.DB = initialize.Gorm() // gorm连接数据库
 	global.LOG = core.Zap()       // 初始化zap日志库
+	initialize.Timer()
 	initialize.Redis()
 	initialize.Routers().Start()
 }

@@ -127,5 +127,5 @@ func (b *Book) GetBookView(bookId int) int {
 }
 
 func (b *Book) SetBookView(bookId int, viewCount int) {
-	global.DB.Update("view_count", viewCount).Where("is_deleted = ?", 0).Where("id = ?", bookId)
+	global.DB.Model(b).Where("is_deleted = ?", 0).Where("id = ?", bookId).Update("view_count", viewCount)
 }

@@ -2,6 +2,7 @@ package global
 
 import (
 	"github.com/MichaelDeSteven/OPBook/server/config"
+	"github.com/MichaelDeSteven/OPBook/server/utils/timer"
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -16,4 +17,5 @@ var (
 	LOG                 *zap.Logger
 	Concurrency_Control = &singleflight.Group{}
 	REDIS               *redis.Client
+	Timer               timer.Timer = timer.NewTimerTask()
 )

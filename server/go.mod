@@ -9,12 +9,12 @@ require (
 	github.com/astaxie/beego v1.12.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.5.1
-	github.com/go-redis/redis v6.14.2+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/onsi/gomega v1.19.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/russross/blackfriday v2.0.0+incompatible
 	github.com/spf13/viper v1.10.1
 	github.com/stretchr/testify v1.7.0

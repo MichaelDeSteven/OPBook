@@ -13,4 +13,5 @@ type Server struct {
 	Local      Local      `mapstructure:"local" json:"local" yaml:"local"`
 	TencentCOS TencentCOS `mapstructure:"tencent-cos" json:"tencentCOS" yaml:"tencent-cos"`
 	Redis      Redis      `mapstructure:"redis" json:"redis" yaml:"redis"`
+	Timer      Timer      `mapstructure:"timer" json:"timer" yaml:"timer"`
 }
