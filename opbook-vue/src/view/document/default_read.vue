@@ -44,7 +44,7 @@
                 </span>
                 <span>
                   <i class="fa fa-eye"></i> 浏览
-                  <i class="read-count">{{ doc.comment_count }}</i>
+                  <i class="read-count">{{ doc.view_count }}</i>
                 </span>
                 <span>
                   <a href="#" data-target="#ModalShare" data-toggle="modal">
