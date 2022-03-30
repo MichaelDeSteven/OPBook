@@ -138,3 +138,46 @@ func Introduct(c *rum.Context) {
 	book := bookService.GetBookIntroduct(identify)
 	response.OkWithData(book, c)
 }
+
+// 收藏或者取消收藏书籍
+func Star(c *rum.Context) {
+	uid, _ := c.Get("uid")
+	if uid == nil {
+		response.FailWithMessage("用户未登录", c)
+		return
+	}
+	bid, err := strconv.Atoi(c.Param("bookId"))
+	if err != nil {
+		response.FailWithMessage("bookId应该为数字", c)
+		return
+	}
+	if cancel := bookService.Star(uid.(int), bid); cancel {
+		response.OkWithMessage("已取消收藏", c)
+	} else {
+		response.OkWithMessage("已收藏", c)
+	}
+}
+
+// 用户收藏书籍的状态
+func IsStar(c *rum.Context) {
+	uid, _ := c.Get("uid")
+	model := &model.Star{
+		IsDeleted: 1,
+	}
+	// 游客状态则未被收藏
+	if uid == nil {
+		response.OkWithData(model, c)
+		return
+	}
+	bid, err := strconv.Atoi(c.Param("bookId"))
+	if err != nil {
+		response.FailWithMessage("bookId应该为数字", c)
+		return
+	}
+	if bookService.IsStar(uid.(int), bid) {
+		model.IsDeleted = 0
+		response.OkWithData(model, c)
+	} else {
+		response.OkWithData(model, c)
+	}
+}

@@ -39,35 +39,34 @@
           <ul class="none-listyle">
             <li>
               <span>来源：</span>
-              <a
-                href="https://github.com/wangdoc/javascript-tutorial"
-                target="_blank"
-                title="来源：阮一峰"
-              >阮一峰</a>
-              <span style="color: #ddd;">&nbsp;|&nbsp;</span>
-              <span>整理：</span>
-              <a target="_blank" class="text-primary" href="/user/admin">进击的皇虫</a>
+              <a :href="book.author_url" target="_blank" title>{{book.author}}</a>
             </li>
-            <li class="bookstack-labels">
+            <!-- <li class="bookstack-labels">
               <a target="_blank" title="javascript" href="/tag/javascript">javascript</a>
               <a target="_blank" title="阮一峰" href="/tag/阮一峰">阮一峰</a>
-            </li>
+            </li>-->
             <li class="bookstack-description hidden-xs">{{ book.description }}</li>
             <li class="book-metadata hidden-xs">
-              <small>章节</small>
               {{ book.doc_count }}
-              <small>阅读</small>
+              <small>章节</small>
               {{ book.view_count }}
-              <small>收藏</small>
+              <small>阅读</small>
               {{ book.collect_count }}
+              <small>收藏</small>
             </li>
             <li class="hidden-xs">
               <a href target="_blank" title="阅读" class="btn btn-info btn-lg">
                 <i class="fa fa-book"></i> 阅读
               </a>
-              <a href="/book/star/192" rel="nofollow" class="btn btn-warning btn-lg ajax-star">
-                <i class="fa fa-heart-o"></i>
-                <span>加入收藏</span>
+              <a rel="nofollow" class="btn btn-warning btn-lg ajax-star" @click="Star">
+                <template v-if="star.is_deleted === 1">
+                  <i class="fa fa-heart-o"></i>
+                  <span>加入收藏</span>
+                </template>
+                <template v-else>
+                  <i class="fa fa-heart"></i>
+                  <span>已收藏</span>
+                </template>
               </a>
             </li>
           </ul>
@@ -130,6 +129,11 @@ export default {
         generate_time: "",
       },
       menuTop: [],
+      star: {
+        book_id: 0,
+        user_id: 0,
+        is_deleted: 0,
+      },
     };
   },
   beforeCreate() {
@@ -163,7 +167,11 @@ export default {
         console.log(res);
         if (res.data.code === 0) {
           this.book = res.data.data;
+          if (this.book.author === "") {
+            this.book.author = "暂无来源";
+          }
           this.GetMenuTop();
+          this.IsStar();
         } else {
         }
       });
@@ -178,6 +186,32 @@ export default {
           this.menuTop = res.data.data;
         } else {
         }
+      });
+    },
+    Star() {
+      service({
+        url: "/book/collect/" + this.book.id,
+        method: "post",
+        data: this.starReq,
+      }).then((res) => {
+        console.log(res);
+        // layer.msg(res.data.data);
+        if (res.data.code === 0) {
+          if (this.star.is_deleted === 1) {
+            this.star.is_deleted = 0;
+          } else {
+            this.star.is_deleted = 1;
+          }
+        }
+      });
+    },
+    IsStar() {
+      service({
+        url: "/book/collect/stat/" + this.book.id,
+        method: "get",
+      }).then((res) => {
+        console.log(res);
+        this.star.is_deleted = res.data.data.is_deleted;
       });
     },
   },

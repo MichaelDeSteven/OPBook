@@ -129,3 +129,13 @@ func (b *Book) GetBookView(bookId int) int {
 func (b *Book) SetBookView(bookId int, viewCount int) {
 	global.DB.Model(b).Where("is_deleted = ?", 0).Where("id = ?", bookId).Update("view_count", viewCount)
 }
+
+func (b *Book) GetCollectCount(bookId int) int {
+	var model Book
+	global.DB.Select("collect_count").Where("is_deleted = ?", 0).Where("id = ?", bookId).Find(&model)
+	return model.CollectCount
+}
+
+func (b *Book) SetCollectCount(bookId int, collectCount int) {
+	global.DB.Model(b).Where("is_deleted = ?", 0).Where("id = ?", bookId).Update("collect_count", collectCount)
+}

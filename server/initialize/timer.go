@@ -10,6 +10,7 @@ func initTimer() {
 		go func() {
 			global.Timer.AddTaskByFunc("BOOK_VIEW_COUNT", global.CONFIG.Timer.Spec, service.UpdateBooksView)
 			global.Timer.AddTaskByFunc("DOC_VIEW_COUNT", global.CONFIG.Timer.Spec, service.UpdateDocsView)
+			global.Timer.AddTaskByFunc("BOOK_STAR_COUNT", global.CONFIG.Timer.Spec, service.UpdateBooksStar)
 		}()
 	}
 }

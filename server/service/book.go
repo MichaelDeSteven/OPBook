@@ -223,6 +223,8 @@ func (bookservice *BookService) GetBookIntroduct(identify string) *model.Book {
 		return nil
 	}
 	increaseBookView(book.Id)
+	book.CollectCount = getCount(utils.BOOK_STAR_COUNT_PREFIX + fmt.Sprint(book.Id))
+	book.ViewCount = getCount(utils.BOOK_VIEW_COUNT_PREFIX + fmt.Sprint(book.Id))
 	return book
 }
 
@@ -235,6 +237,7 @@ func (bookservice *BookService) Read(bookIdentify, docIdentify string) (map[stri
 		return nil, errors.New("目标文档不存在")
 	}
 	data := make(map[string]interface{}, 3)
+	doc.ViewCount = getCount(utils.DOC_VIEW_COUNT_PREFIX + fmt.Sprint(doc.Id))
 	data["doc"] = doc
 	tree, err := model.NewDocument().CreateDocumentTreeForHtml(doc.BookId, doc.Id)
 	if err != nil {
@@ -271,6 +274,12 @@ func increaseDocView(docId int) {
 	}
 }
 
+// 获取Redis缓存key的value
+func getCount(key string) int {
+	val, _ := global.REDIS.Get(context.Background(), key).Int()
+	return val
+}
+
 func UpdateBooksView() {
 	book := model.NewBook()
 	set, _ := global.REDIS.Keys(context.Background(), utils.BOOK_VIEW_COUNT_PREFIX+"*").Result()
@@ -278,7 +287,6 @@ func UpdateBooksView() {
 		ss := strings.Split(val, "_")
 		bookId, _ := strconv.Atoi(ss[len(ss)-1])
 		viewCount, _ := global.REDIS.Get(context.Background(), val).Int()
-		global.LOG.Sugar().Infof("%+v %v\n", bookId, viewCount)
 		book.SetBookView(bookId, viewCount)
 	}
 }
@@ -291,5 +299,57 @@ func UpdateDocsView() {
 		docId, _ := strconv.Atoi(ss[len(ss)-1])
 		viewCount, _ := global.REDIS.Get(context.Background(), val).Int()
 		doc.SetDocumentView(docId, viewCount)
+	}
+}
+
+// 收藏或者取消收藏
+func (bookservice *BookService) Star(userId, bookId int) (cancel bool) {
+	var model model.Star
+	star := model.GetStarbyUserIdAndBookId(userId, bookId)
+	// 取消收藏
+	if star.Id == 0 {
+		star.Star(userId, bookId, false)
+		setIncreAndDecreCollectCount(bookId, 1)
+	} else {
+		if star.IsDeleted == 0 {
+			star.IsDeleted = 1
+			star.Star(userId, bookId, true)
+			cancel = true
+			setIncreAndDecreCollectCount(bookId, -1)
+		} else {
+			star.IsDeleted = 0
+			star.Star(userId, bookId, true)
+			setIncreAndDecreCollectCount(bookId, 1)
+		}
+	}
+	return
+}
+
+func (bookservice *BookService) IsStar(userId, bookId int) bool {
+	var model model.Star
+	return model.IsStar(userId, bookId)
+}
+
+func setIncreAndDecreCollectCount(bookId, amount int) {
+	key := utils.BOOK_STAR_COUNT_PREFIX + fmt.Sprint(bookId)
+	val, err := global.REDIS.Get(context.Background(), key).Int()
+	if err == nil {
+		global.REDIS.Set(context.Background(), key, val+amount, 0)
+	} else if err == redis.Nil {
+		global.REDIS.Set(context.Background(), key, model.NewBook().GetCollectCount(bookId)+amount, 0)
+	} else {
+		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
+}
+
+func UpdateBooksStar() {
+	book := model.NewBook()
+	set, _ := global.REDIS.Keys(context.Background(), utils.BOOK_STAR_COUNT_PREFIX+"*").Result()
+	for _, val := range set {
+		ss := strings.Split(val, "_")
+		bookId, _ := strconv.Atoi(ss[len(ss)-1])
+		collectCount, _ := global.REDIS.Get(context.Background(), val).Int()
+		global.LOG.Sugar().Infof("%+v %v\n", bookId, collectCount)
+		book.SetCollectCount(bookId, collectCount)
 	}
 }

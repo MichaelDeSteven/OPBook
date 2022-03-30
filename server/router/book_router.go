@@ -16,4 +16,6 @@ func (s *BookRouter) InitBookRouter(r *rum.RouterGroup) {
 	bookRouter.POST("/upload", controller.UploadProject)
 	bookRouter.POST("/release/:bookId", controller.Release)
 	bookRouter.GET("/introduct/:identify", controller.Introduct)
+	bookRouter.POST("/collect/:bookId", controller.Star)
+	bookRouter.GET("/collect/stat/:bookId", controller.IsStar)
 }
