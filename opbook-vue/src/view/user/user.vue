@@ -2,21 +2,23 @@
   <div>
     <div class="manual-reader manual-container">
       <Header></Header>
-      <div class="container ucenter">
-        <div class="row">
-          <div class="col-xs-12 col-sm-4 col-md-3">
-            <UserBase :profile="profile"></UserBase>
-          </div>
-          <div class="col-xs-12 col-sm-8 col-md-9">
-            <div class="row">
-              <div class="col-xs-12"></div>
-              <div class="col-xs-12">
-                <div class="ucenter-content">
-                  <UserTab></UserTab>
+      <div class="ucenter">
+        <div class="container-fluid container-widescreen">
+          <div class="row">
+            <div class="col-xs-12 col-sm-4 col-md-3 col-lg-2">
+              <UserBase :profile="profile"></UserBase>
+            </div>
+            <div class="col-xs-12 col-sm-8 col-md-9 col-lg-10">
+              <div class="row">
+                <div class="col-xs-12"></div>
+                <div class="col-xs-12">
+                  <div class="ucenter-content">
+                    <UserTab></UserTab>
+                  </div>
                 </div>
-              </div>
-              <div class="pagination-container">
-                <!-- {{.PageHtml}} -->
+                <div class="pagination-container">
+                  <!-- {{.PageHtml}} -->
+                </div>
               </div>
             </div>
           </div>

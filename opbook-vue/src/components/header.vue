@@ -49,11 +49,11 @@
         <nav class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class>
-              <a href title="首页">
+              <a href="/index" title="首页">
                 <i class="fa fa-home"></i> 首页
               </a>
             </li>
-            <li class>
+            <!-- <li class>
               <a href title="发现">
                 <i class="fa fa-globe"></i> 发现
               </a>
@@ -62,9 +62,9 @@
               <a href title="榜单">
                 <img src="/static/images/rank.png" alt /> 榜单
               </a>
-            </li>
+            </li>-->
             <li class>
-              <a href title="搜索">
+              <a href="/search" title="搜索">
                 <i class="fa fa-search"></i> 搜索
               </a>
             </li>
@@ -78,16 +78,55 @@
       role="navigation"
     >
       <ul class="nav navbar-nav navbar-right" style="margin-right: 15px;">
-        <li>
-          <a href title="注册">
-            <i class="fa fa-user-plus"></i> 注册
-          </a>
-        </li>
-        <li>
-          <a href title="登录">
-            <i class="fa fa-sign-in"></i> 登录
-          </a>
-        </li>
+        <template v-if="loginStat">
+          <li>
+            <div class="img user-info" data-toggle="dropdown">
+              <img
+                onerror="this.src='/static/images/avatar.png'"
+                :src="user.avatar"
+                class="img-circle userbar-avatar border"
+              />
+              <div class="userbar-content">
+                <span>{{user.nickname}}</span>
+              </div>
+              <i class="fa fa-chevron-down" aria-hidden="true"></i>
+            </div>
+            <ul class="dropdown-menu user-info-dropdown" role="menu">
+              <li>
+                <a :href="'/user/' + user.id" target="_blank" title="个人主页">
+                  <i class="fa fa-home" aria-hidden="true"></i> 个人主页
+                </a>
+              </li>
+              <li>
+                <a href="/setting" title="个人设置">
+                  <i class="fa fa-cogs" aria-hidden="true"></i> 个人设置
+                </a>
+              </li>
+              <li>
+                <a href="/star" title="我的收藏">
+                  <i class="fa fa-heart-o" aria-hidden="true"></i> 我的收藏
+                </a>
+              </li>
+              <li>
+                <a title="退出登录" @click="quit">
+                  <i class="fa fa-sign-out"></i> 退出登录
+                </a>
+              </li>
+            </ul>
+          </li>
+        </template>
+        <template v-else>
+          <li>
+            <a href="/reg" title="注册">
+              <i class="fa fa-user-plus"></i> 注册
+            </a>
+          </li>
+          <li>
+            <a href="/login" title="登录">
+              <i class="fa fa-sign-in"></i> 登录
+            </a>
+          </li>
+        </template>
       </ul>
     </nav>
   </header>
@@ -104,7 +143,33 @@
 export default {
   name: "Header",
   data() {
-    return {};
+    return {
+      user: {
+        id: "",
+        email: "",
+        nickname: "",
+        avatar: "",
+      },
+      loginStat: false,
+    };
+  },
+  created() {
+    if (localStorage.getItem("user") != null) {
+      var u = JSON.parse(localStorage.getItem("user"));
+      this.user.id = u.id;
+      this.user.nickname = u.nickname;
+      this.user.email = u.email;
+      this.user.avatar = u.avatar;
+      this.loginStat = true;
+    }
+  },
+  methods: {
+    quit() {
+      localStorage.setItem("user", null);
+      localStorage.setItem("token", null);
+      this.loginStat = true;
+      window.location = "/index";
+    },
   },
 };
 </script>

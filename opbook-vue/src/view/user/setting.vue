@@ -145,7 +145,6 @@ export default {
         nickname: "",
         mobile: "",
         avatar: "",
-        email: "",
         password: "",
       },
     };
@@ -269,7 +268,6 @@ export default {
       this.user.email = u.email;
       this.user.mobile = u.mobile;
       this.user.avatar = u.avatar;
-      this.user.email = u.email;
       this.user.password = u.password;
     },
     UpdateUserProfile() {
