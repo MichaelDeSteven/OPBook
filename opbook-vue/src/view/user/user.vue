@@ -62,7 +62,7 @@ export default {
         url: "/user/" + this.$route.params.uid,
         method: "get",
       }).then((res) => {
-        layer.msg(res.data.msg);
+        // layer.msg(res.data.msg);
         if (res.data.code === 0) {
           this.profile = res.data.data;
         } else {

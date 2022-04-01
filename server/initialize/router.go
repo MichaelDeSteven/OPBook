@@ -11,10 +11,12 @@ func initRouters() *rum.Engine {
 	base := router.BaseRouter{}
 	user := router.UserRouter{}
 	book := router.BookRouter{}
+	social := router.SocialRouter{}
 	doc := router.DocumentRouter{}
 	base.InitBaseRouter(PublicGroup)
 	user.InitUserRouter(PublicGroup)
 	book.InitBookRouter(PublicGroup)
 	doc.InitDocumentRouter(PublicGroup)
+	social.InitSocialRouter(PublicGroup)
 	return r
 }
