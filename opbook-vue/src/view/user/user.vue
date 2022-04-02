@@ -12,8 +12,25 @@
               <div class="row">
                 <div class="col-xs-12"></div>
                 <div class="col-xs-12">
-                  <div class="ucenter-content">
-                    <UserTab></UserTab>
+                  <ul class="nav nav-tabs">
+                    <li :class="{'active':select===0}">
+                      <a href="javascript:;" @click="select=0">收藏</a>
+                    </li>
+                    <li :class="{'active':select===1}">
+                      <a href="javascript:;" @click="select=1">关注</a>
+                    </li>
+                    <li :class="{'active':select===2}">
+                      <a href="javascript:;" @click="select=2">粉丝</a>
+                    </li>
+                  </ul>
+                  <div v-if="select===0">
+                    <Collection></Collection>
+                  </div>
+                  <div v-if="select===1">
+                    <Follow></Follow>
+                  </div>
+                  <div v-if="select===2">
+                    <Fan></Fan>
                   </div>
                 </div>
                 <div class="pagination-container">
@@ -32,16 +49,25 @@
 <script>
 import Header from "@/components/header.vue";
 import UserBase from "@/components/user/base.vue";
-import UserTab from "@/components/user/tab.vue";
+import Fan from "@/components/user/fans.vue";
+import Follow from "@/components/user/follow.vue";
+import Collection from "@/components/user/collection.vue";
 import Footer from "@/components/footer.vue";
 import service from "@/utils/request";
 export default {
   name: "User",
   components: {
     UserBase,
-    UserTab,
     Header,
     Footer,
+    Fan,
+    Follow,
+    Collection,
+  },
+  data() {
+    return {
+      select: 0,
+    };
   },
   props: { profile: Object },
   created() {

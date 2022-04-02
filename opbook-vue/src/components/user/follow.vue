@@ -27,7 +27,7 @@
 import myPagination from "@/components/page";
 import service from "@/utils/request";
 export default {
-  name: "Fan",
+  name: "Follow",
   components: {
     myPagination,
   },
@@ -45,12 +45,12 @@ export default {
   created() {
     this.page.user_id = parseInt(this.$route.params.uid);
     this.page.page_index = 1;
-    this.GetFollowers();
+    this.GetFollowees();
   },
   methods: {
-    GetFollowers() {
+    GetFollowees() {
       service({
-        url: "/social/fan/getFollowers",
+        url: "/social/fan/getFollowees",
         method: "post",
         data: this.page,
       }).then((res) => {
@@ -67,7 +67,7 @@ export default {
         return;
       }
       this.page.page_index = nextPage;
-      this.GetFollowers();
+      this.GetFollowees();
     },
   },
 };

@@ -6,6 +6,16 @@ type Follow struct {
 	FollowStat bool `json:"follow_stat"`
 }
 
+type FollowPage struct {
+	PageIndex int `json:"page_index"`
+	PageSize  int `json:"page_size"`
+	UserId    int `json:"user_id"`
+}
+
 func NewFollow() *Follow {
 	return &Follow{}
+}
+
+func NewFollowPage() *FollowPage {
+	return &FollowPage{}
 }

@@ -353,3 +353,18 @@ func UpdateBooksStar() {
 		book.SetCollectCount(bookId, collectCount)
 	}
 }
+
+func (bookservice *BookService) UserCollection(page *model.UserCollectPage) (books []*model.Book, totalCount int64, err error) {
+	if page.PageIndex < 1 {
+		page.PageIndex = 1
+	}
+	star, book := model.NewStar(), model.NewBook()
+	totalCount = star.GetUserCollectCount(page.UserId)
+	stars := star.GetUserCollectList(page.UserId, page.PageIndex, page.PageSize)
+	ids := make([]int, len(stars))
+	for i, star := range stars {
+		ids[i] = star.BookId
+	}
+	books, _ = book.GetBooksById(ids)
+	return
+}

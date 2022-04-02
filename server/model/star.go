@@ -43,3 +43,14 @@ func (s *Star) IsStar(userId, bookId int) bool {
 	global.DB.Where("is_deleted = ?", 0).Where("user_id = ?", userId).Where("book_id = ?", bookId).First(s)
 	return s.Id > 0
 }
+
+func (s *Star) GetUserCollectCount(userId int) (count int64) {
+	global.DB.Model(s).Where("is_deleted = ?", 0).Where("user_id = ?", userId).Count(&count)
+	return
+}
+
+func (s *Star) GetUserCollectList(userId, pageIndex, pageSize int) (stars []Star) {
+	offset := (pageIndex - 1) * pageSize
+	global.DB.Where("is_deleted = ?", 0).Where("user_id = ?", userId).Order("id desc").Limit(pageSize).Offset(offset).Find(&stars)
+	return
+}

@@ -24,5 +24,6 @@ func (s *BaseRouter) InitBaseRouter(r *rum.RouterGroup) {
 
 	searchController := controller.SearchController{}
 	r.POST("/search", searchController.Result)
+	r.POST("/book/user/collect", controller.UserCollection)
 
 }

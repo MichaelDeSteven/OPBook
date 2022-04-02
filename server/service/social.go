@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/MichaelDeSteven/OPBook/server/global"
+	"github.com/MichaelDeSteven/OPBook/server/model"
 	"github.com/MichaelDeSteven/OPBook/server/utils"
 	"github.com/go-redis/redis/v8"
 )
@@ -40,8 +41,42 @@ func (socialService *SocialService) FollowStatus(userId, followeeId int) bool {
 }
 
 // 获取关注列表
+func (socialService *SocialService) GetFollowees(page *model.FollowPage) (followees []model.User, totalCount uint64, err error) {
+	totalCount, _ = global.REDIS.ZCard(context.Background(), getFolloweeKey(page.UserId)).Uint64()
+	if page.PageIndex < 1 {
+		page.PageIndex = 1
+	}
+	start, stop := (page.PageIndex-1)*page.PageSize, page.PageIndex+page.PageSize-2
+	vals, err := global.REDIS.ZRange(context.Background(), getFolloweeKey(page.UserId), int64(start), int64(stop)).Result()
+	if err != nil {
+		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
+	model := model.NewUser()
+	for _, val := range vals {
+		uid, _ := strconv.Atoi(val)
+		followees = append(followees, *model.FindByUid(uid))
+	}
+	return
+}
 
 // 获取粉丝列表
+func (socialService *SocialService) GetFollowers(page *model.FollowPage) (followers []model.User, totalCount uint64, err error) {
+	totalCount, _ = global.REDIS.ZCard(context.Background(), getFollowerKey(page.UserId)).Uint64()
+	if page.PageIndex < 1 {
+		page.PageIndex = 1
+	}
+	start, stop := (page.PageIndex-1)*page.PageSize, page.PageIndex+page.PageSize-2
+	vals, err := global.REDIS.ZRange(context.Background(), getFollowerKey(page.UserId), int64(start), int64(stop)).Result()
+	if err != nil {
+		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
+	model := model.NewUser()
+	for _, val := range vals {
+		uid, _ := strconv.Atoi(val)
+		followers = append(followers, *model.FindByUid(uid))
+	}
+	return
+}
 
 func getFollowerKey(userId int) string {
 	return utils.FOLLOWER_SET_KEY + fmt.Sprintf("%v", userId)

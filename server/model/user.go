@@ -22,6 +22,10 @@ type User struct {
 	IsDeleted     int       `gorm:"default:0;" json:"is_deleted"`                // 逻辑删除（0:可用 1:不可用）
 }
 
+func NewUser() *User {
+	return &User{}
+}
+
 func (u *User) TableName() string {
 	return "opbook_user"
 }

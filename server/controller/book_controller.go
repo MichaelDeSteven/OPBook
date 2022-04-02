@@ -181,3 +181,20 @@ func IsStar(c *rum.Context) {
 		response.OkWithData(model, c)
 	}
 }
+
+// 用户书籍收藏列表
+func UserCollection(c *rum.Context) {
+	page := model.NewUserCollectPage()
+	c.Bind(&page)
+	global.LOG.Sugar().Infof("%+v\n", page)
+	books, totalCount, err := bookService.UserCollection(page)
+	if err != nil {
+		global.LOG.Sugar().Errorf("查询失败: %+v\n", err)
+		response.FailWithMessage("查询失败", c)
+		return
+	}
+	data := make(map[string]interface{})
+	data["books"] = books
+	data["totalCount"] = totalCount
+	response.OkWithData(data, c)
+}

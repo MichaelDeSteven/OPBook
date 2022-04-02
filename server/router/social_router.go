@@ -14,4 +14,6 @@ func (s *SocialRouter) InitSocialRouter(r *rum.RouterGroup) {
 	follow := controller.FollowController{}
 	socialRouter.POST("/fan/follow", follow.Follow)
 	socialRouter.POST("/fan/stat", follow.FollowStatus)
+	socialRouter.POST("/fan/getFollowees", follow.GetFollowees)
+	socialRouter.POST("/fan/getFollowers", follow.GetFollowers)
 }
