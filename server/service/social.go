@@ -85,3 +85,27 @@ func getFollowerKey(userId int) string {
 func getFolloweeKey(followerId int) string {
 	return utils.FOLLOWEE_SET_KEY + fmt.Sprintf("%v", followerId)
 }
+
+// 评论或回复
+func (socialService *SocialService) CommentOrReply(comment model.Comment) {
+	err := comment.AddComment()
+	if err != nil {
+		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
+}
+
+func (socialService *SocialService) DisplayComment(bookId int) (res []*model.CommentResult) {
+	comment := model.NewComment()
+	res = comment.GetCommentByBookId(bookId)
+	ma := make(map[int]*model.CommentResult, len(res))
+	for _, c := range res {
+		ma[c.Id] = c
+	}
+	for i, r := range res {
+		if res[i].CommentId != 0 {
+			res[i].ReplyContent = ma[r.CommentId].Content
+			res[i].ReplyNickname = ma[r.Id].Nickname
+		}
+	}
+	return
+}

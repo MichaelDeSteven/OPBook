@@ -75,25 +75,93 @@
       <div class="row">
         <div class="col-xs-12 bookstack-menu">
           <ul class="nav nav-tabs">
-            <li class="active">
-              <a href>书籍目录</a>
+            <li :class="{'active':select===0}">
+              <a href="javascript:;" @click="select=0">书籍目录</a>
             </li>
-            <li>
-              <a href>
-                书籍评论 (
-                <span class="text-muted">{{ book.comment_count }}</span>)
-              </a>
+            <li :class="{'active':select===1}">
+              <a href="javascript:;" @click="DisplayComment">书籍评论</a>
             </li>
           </ul>
           <div class="help-block">
             <ul class="none-listyle">
-              <li v-for="item in menuTop" :key="item.id">
-                <a
-                  :href="'/read/' + book.name + '/' + item.identify"
-                  target="_blank"
-                  :title="item.name"
-                >{{ item.name }}</a>
-              </li>
+              <div v-if="select===0">
+                <li v-for="item in menuTop" :key="item.id">
+                  <a
+                    :href="'/read/' + book.name + '/' + item.identify"
+                    target="_blank"
+                    :title="item.name"
+                  >{{ item.name }}</a>
+                </li>
+              </div>
+              <div v-if="select===1">
+                <form action method="post" class="ajax-form">
+                  <div class="form-group">
+                    <textarea
+                      class="form-control"
+                      name="content"
+                      rows="3"
+                      placeholder="文明评论，理性发言"
+                      v-model="comment.content"
+                    ></textarea>
+                  </div>
+                  <div class="form-group">
+                    <span class="pull-left text-muted"></span>
+                    <input
+                      type="button"
+                      class="btn btn-success pull-right"
+                      value="发表点评"
+                      @click="AddComment(0)"
+                    />
+                  </div>
+                </form>
+                <li class="comments-list">
+                  <ul>
+                    <li class="clearfix" v-for="item in commentList">
+                      <div class="col-xs-12">
+                        <img :src="item.avatar" class="img-thumbnail img-circle img-responsive" alt />
+                        <span class="username">{{item.nickname}}</span>
+                        <span class="text-muted">
+                          <i></i>
+                          {{ new Date(item.comment_time).format("yyyy-MM-dd hh:mm:ss") }}
+                        </span>
+                        <span class="repley" @click="reply.id=item.id">
+                          <i class="fa fa-comments-o"></i>
+                          回复
+                        </span>
+                      </div>
+                      <div v-if="item.comment_id !== 0" class="col-xs-12 comments-content">
+                        <div class="reply-to">
+                          <span class="text-info">{{item.reply_nickname}}</span>
+                          : {{item.reply_content}}
+                        </div>
+                      </div>
+                      <div class="col-xs-12 comments-content">{{item.content}}</div>
+                      <div v-if="reply.id===item.id">
+                        <form action method="post" class="ajax-form">
+                          <div class="form-group">
+                            <textarea
+                              class="form-control"
+                              name="content"
+                              rows="3"
+                              placeholder="文明评论，理性发言"
+                              v-model="reply.content"
+                            ></textarea>
+                          </div>
+                          <div class="form-group">
+                            <span class="pull-left text-muted"></span>
+                            <input
+                              type="button"
+                              class="btn btn-success pull-right"
+                              value="发表点评"
+                              @click="AddComment(item.id)"
+                            />
+                          </div>
+                        </form>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+              </div>
             </ul>
           </div>
         </div>
@@ -134,12 +202,28 @@ export default {
         user_id: 0,
         is_deleted: 0,
       },
+      select: 0,
+      comment: {
+        book_id: 0,
+        user_id: 0,
+        content: "",
+        comment_id: 0,
+      },
+      commentList: [],
+      reply: {
+        id: 0,
+        content: "",
+      },
     };
   },
   beforeCreate() {
     document.querySelector("body").setAttribute("id", "bookstack-intro");
   },
   created() {
+    var u = JSON.parse(localStorage.getItem("user"));
+    if (u != null) {
+      this.comment.user_id = parseInt(u.id);
+    }
     // watch 路由的参数，以便再次获取数据
     this.$watch(
       () => this.$route.params,
@@ -212,6 +296,37 @@ export default {
       }).then((res) => {
         console.log(res);
         this.star.is_deleted = res.data.data.is_deleted;
+      });
+    },
+    AddComment(CommentId) {
+      this.comment.comment_id = CommentId;
+      this.comment.book_id = this.book.id;
+      if (CommentId !== 0) {
+        this.comment.content = this.reply.content;
+      }
+      if (this.comment.user_id === 0) {
+        layer.msg("用户未登录");
+      }
+      service({
+        url: "/social/comment/add",
+        method: "post",
+        data: this.comment,
+      }).then((res) => {
+        location.reload();
+        console.log(res);
+      });
+    },
+    DisplayComment() {
+      this.select = 1;
+      service({
+        url: "/social/comment/get/" + this.book.id,
+        method: "get",
+      }).then((res) => {
+        console.log(res);
+        if (res.data.code === 0) {
+          this.commentList = res.data.data;
+        } else {
+        }
       });
     },
   },
