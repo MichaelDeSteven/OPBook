@@ -26,6 +26,9 @@
                   <i class="fa fa-heart-o"></i> 关注Ta
                 </a>
               </template>
+              <a target :href="'/whisper/' + profile.id" class="btn btn-success btn-sm">
+                <i></i> 私信
+              </a>
             </template>
           </div>
           <div class="user-stat">

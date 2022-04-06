@@ -71,3 +71,8 @@ func (u *User) FindByUid(uid int) (user *User) {
 	global.DB.Where("is_deleted = ?", 0).Where("id = ?", uid).First(&user)
 	return user
 }
+
+func (u *User) FindInfoByIds(ids []int) (list []*User) {
+	global.DB.Select("id, nickname, avatar").Where("is_deleted = ?", 0).Where("id in ?", ids).Find(&list)
+	return
+}

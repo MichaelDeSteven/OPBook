@@ -109,3 +109,54 @@ func (socialService *SocialService) DisplayComment(bookId int) (res []*model.Com
 	}
 	return
 }
+
+// 发送私信
+func (socialService *SocialService) SendMessage(message *model.Message) {
+	message.ConversationId = GetConversationId(message.FromId, message.ToId)
+	if err := message.Add(); err != nil {
+		global.LOG.Sugar().Errorf("%+v\n", err)
+	}
+
+}
+
+// 获取指定会话的私信内容
+func (socialService *SocialService) GetConversation(message *model.Message) (messages []*model.Message) {
+	messages = message.GetConversationById(GetConversationId(message.FromId, message.ToId))
+	return
+}
+
+// 获取所有与某用户有私信记录的用户列表
+func (socialService *SocialService) GetConversationUserList(uid int) (list []*model.User) {
+	message, user := model.NewMessage(), model.NewUser()
+	mList := message.GetUserList(uid)
+	uList := make([]int, len(mList))
+	for i, m := range mList {
+		if m.FromId == uid {
+			uList[i] = m.ToId
+		} else {
+			uList[i] = m.FromId
+		}
+	}
+	list = user.FindInfoByIds(uList)
+	return
+}
+
+// 生成会话id
+func GetConversationId(fromId, toId int) string {
+	user := model.NewUser()
+	if fromId < 1 || user.FindByUid(fromId) == nil {
+		global.LOG.Sugar().Infof("fromId不存在: %+v\n", fromId)
+		return ""
+	}
+	if toId < 1 || user.FindByUid(toId) == nil {
+		global.LOG.Sugar().Infof("toId不存在: %+v\n", toId)
+		return ""
+	}
+	var conversationId = ""
+	if fromId < toId {
+		conversationId = fmt.Sprintf("%+v_%+v", fromId, toId)
+	} else {
+		conversationId = fmt.Sprintf("%+v_%+v", toId, fromId)
+	}
+	return conversationId
+}
