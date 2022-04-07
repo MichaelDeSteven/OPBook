@@ -9,8 +9,8 @@
             <span>语言：</span>
             <span style="color: red">中文</span>
             <span class="mgl-10px">评分：</span>
-            <i class="bookstack-star star-45"></i>
-            {{ book.score / 10 }}
+            <i class="bookstack-star"></i>
+            {{ book.score*1.0 / 10.0 }}
             <span class="hidden-xs">
               (
               <span class="text-muted">{{ book.score_count }}个有效评分</span>)
@@ -94,6 +94,28 @@
                 </li>
               </div>
               <div v-if="select===1">
+                <li class="comments-form clearfix">
+                  <div class="score">
+                    <template v-if="score.score === 0">
+                      <span title="点击即可给当前书籍打分" class="cursor-pointer" data-toggle="tooltip">
+                        <i class="fa fa-star-o" data-score="1" data-tips="很差" @click="AddScore(10)"></i>
+                        <i class="fa fa-star-o" data-score="2" data-tips="较差" @click="AddScore(20)"></i>
+                        <i class="fa fa-star-o" data-score="3" data-tips="还行" @click="AddScore(30)"></i>
+                        <i class="fa fa-star-o" data-score="4" data-tips="推荐" @click="AddScore(40)"></i>
+                        <i class="fa fa-star-o" data-score="5" data-tips="力荐" @click="AddScore(50)"></i>
+                      </span>
+                      <span class="text-muted"></span>
+                    </template>
+                    <template v-else>
+                      <span class="text-muted">
+                        我的评分:
+                        <i
+                          :class="['bookstack-star', {'star-10' : myScore[0]}, {'star-20' : myScore[1]}, {'star-30' : myScore[2]}, {'star-40' : myScore[3]}, {'star-50' : myScore[4]}]"
+                        ></i>
+                      </span>
+                    </template>
+                  </div>
+                </li>
                 <form action method="post" class="ajax-form">
                   <div class="form-group">
                     <textarea
@@ -191,7 +213,7 @@ export default {
         cover: "",
         comment_count: 0,
         score_count: 0,
-        score: 0.0,
+        score: 0,
         view_count: 0,
         collect_count: 0,
         generate_time: "",
@@ -214,6 +236,12 @@ export default {
         id: 0,
         content: "",
       },
+      score: {
+        user_id: 0,
+        book_id: 0,
+        score: 0,
+      },
+      myScore: [false, false, false, false, false],
     };
   },
   beforeCreate() {
@@ -223,6 +251,7 @@ export default {
     var u = JSON.parse(localStorage.getItem("user"));
     if (u != null) {
       this.comment.user_id = parseInt(u.id);
+      this.score.user_id = parseInt(u.id);
     }
     // watch 路由的参数，以便再次获取数据
     this.$watch(
@@ -256,6 +285,10 @@ export default {
           }
           this.GetMenuTop();
           this.IsStar();
+          this.score.book_id = this.book.id;
+          var arr = document.getElementsByClassName("bookstack-star");
+          arr[0].classList.add("star-" + this.book.score);
+          this.GetScore();
         } else {
         }
       });
@@ -325,6 +358,34 @@ export default {
         console.log(res);
         if (res.data.code === 0) {
           this.commentList = res.data.data;
+        } else {
+        }
+      });
+    },
+    AddScore(score) {
+      this.score.score = score;
+      this.myScore[score / 10 - 1] = true;
+      service({
+        url: "/book/score/add",
+        method: "post",
+        data: this.score,
+      }).then((res) => {
+        console.log(res);
+        if (res.data.code === 0) {
+        } else {
+        }
+      });
+    },
+    GetScore() {
+      service({
+        url: "/book/score/get",
+        method: "post",
+        data: this.score,
+      }).then((res) => {
+        console.log(res);
+        if (res.data.code === 0) {
+          this.score = res.data.data;
+          this.myScore[this.score.score / 10 - 1] = true;
         } else {
         }
       });

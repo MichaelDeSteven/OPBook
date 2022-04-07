@@ -139,3 +139,13 @@ func (b *Book) GetCollectCount(bookId int) int {
 func (b *Book) SetCollectCount(bookId int, collectCount int) {
 	global.DB.Model(b).Where("is_deleted = ?", 0).Where("id = ?", bookId).Update("collect_count", collectCount)
 }
+
+func (b *Book) GetScore(bookId int) *Book {
+	var model *Book
+	global.DB.Select("id, score_count, score").Where("is_deleted = ?", 0).Where("id = ?", bookId).Find(&model)
+	return model
+}
+
+func (b *Book) SetScore(book *Book) {
+	global.DB.Model(b).Where("is_deleted = ?", 0).Where("id = ?", book.Id).Updates(map[string]interface{}{"score_count": book.ScoreCount, "score": book.Score})
+}

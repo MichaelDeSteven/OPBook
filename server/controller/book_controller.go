@@ -198,3 +198,35 @@ func UserCollection(c *rum.Context) {
 	data["totalCount"] = totalCount
 	response.OkWithData(data, c)
 }
+
+// 评分
+func AddScore(c *rum.Context) {
+	score := model.NewScore()
+	c.Bind(score)
+	if score.UserId < 1 {
+		response.FailWithMessage("用户id为0", c)
+		return
+	}
+	if score.BookId < 1 {
+		response.FailWithMessage("书籍id为0", c)
+		return
+	}
+	bookService.AddScore(score)
+	response.Ok(c)
+}
+
+// 获取评分
+func GetScore(c *rum.Context) {
+	score := model.NewScore()
+	c.Bind(score)
+	if score.UserId < 1 {
+		response.FailWithMessage("用户id为0", c)
+		return
+	}
+	if score.BookId < 1 {
+		response.FailWithMessage("书籍id为0", c)
+		return
+	}
+	response.OkWithData(bookService.GetScore(score), c)
+	return
+}

@@ -368,3 +368,19 @@ func (bookservice *BookService) UserCollection(page *model.UserCollectPage) (boo
 	books, _ = book.GetBooksById(ids)
 	return
 }
+
+func (bookservice *BookService) AddScore(score *model.Score) {
+	if score.GetScore(score.BookId, score.UserId).Id >= 1 {
+		global.LOG.Sugar().Errorf("您已给当前书籍打过分了")
+		return
+	}
+	score.AddScore()
+	book := model.NewBook().GetScore(score.BookId)
+	book.ScoreCount++
+	book.Score = (book.Score*(book.ScoreCount-1) + score.Score) / book.ScoreCount
+	book.SetScore(book)
+}
+
+func (bookservice *BookService) GetScore(score *model.Score) *model.Score {
+	return score.GetScore(score.BookId, score.UserId)
+}
