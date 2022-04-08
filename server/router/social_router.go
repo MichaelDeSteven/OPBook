@@ -23,4 +23,5 @@ func (s *SocialRouter) InitSocialRouter(r *rum.RouterGroup) {
 	socialRouter.POST("/chat/add", chat.SendMessage)
 	socialRouter.GET("/chat/getUserList", chat.GetConversationUserList)
 	socialRouter.POST("/chat/getConversation", chat.GetConversation)
+	socialRouter.POST("/like/:commentId", comment.Like)
 }

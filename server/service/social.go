@@ -86,6 +86,10 @@ func getFolloweeKey(followerId int) string {
 	return utils.FOLLOWEE_SET_KEY + fmt.Sprintf("%v", followerId)
 }
 
+func getLikeKey(commentId int) string {
+	return utils.LIKE_SET_KEY + fmt.Sprintf("%v", commentId)
+}
+
 // 评论或回复
 func (socialService *SocialService) CommentOrReply(comment model.Comment) {
 	err := comment.AddComment()
@@ -94,7 +98,7 @@ func (socialService *SocialService) CommentOrReply(comment model.Comment) {
 	}
 }
 
-func (socialService *SocialService) DisplayComment(bookId int) (res []*model.CommentResult) {
+func (socialService *SocialService) DisplayComment(bookId, uid int, login bool) (res []*model.CommentResult) {
 	comment := model.NewComment()
 	res = comment.GetCommentByBookId(bookId)
 	ma := make(map[int]*model.CommentResult, len(res))
@@ -105,6 +109,12 @@ func (socialService *SocialService) DisplayComment(bookId int) (res []*model.Com
 		if res[i].CommentId != 0 {
 			res[i].ReplyContent = ma[r.CommentId].Content
 			res[i].ReplyNickname = ma[r.Id].Nickname
+		}
+		// 查询每条评论是否被用户点赞
+		if login {
+			global.LOG.Sugar().Infof("DisplayComment：%+v\n", res[i].Id)
+			res[i].IsLike = socialService.likeStatus(res[i].Id, uid)
+			res[i].LikeCount = int(socialService.likeCount(res[i].Id))
 		}
 	}
 	return
@@ -159,4 +169,35 @@ func GetConversationId(fromId, toId int) string {
 		conversationId = fmt.Sprintf("%+v_%+v", toId, fromId)
 	}
 	return conversationId
+}
+
+// 点赞或取消点赞
+func (socialService *SocialService) Like(commentId, userId int) *model.CommentResult {
+	now := float64(time.Now().Unix())
+	res := model.NewCommentResult()
+	res.CommentId = commentId
+	isLike := false
+	if !socialService.likeStatus(commentId, userId) {
+		global.REDIS.ZAdd(context.Background(), getLikeKey(commentId), &redis.Z{Score: now, Member: userId})
+		isLike = true
+	} else {
+		global.REDIS.ZRem(context.Background(), getLikeKey(commentId), userId)
+	}
+	res.IsLike = isLike
+	return res
+}
+
+// 是否已关注
+func (socialService *SocialService) likeStatus(commentId, userId int) bool {
+	_, err := global.REDIS.ZScore(context.Background(), getLikeKey(commentId), strconv.Itoa(userId)).Result()
+	if err != nil && err == redis.Nil {
+		return false
+	}
+	return true
+}
+
+// 是否已关注
+func (socialService *SocialService) likeCount(commentId int) int64 {
+	val, _ := global.REDIS.ZCard(context.Background(), getLikeKey(commentId)).Result()
+	return val
 }

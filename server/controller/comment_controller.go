@@ -27,5 +27,24 @@ func (this *CommentController) DisplayComment(c *rum.Context) {
 		response.FailWithMessage("bookId应该为数字", c)
 		return
 	}
-	response.OkWithData(socialService.DisplayComment(bid), c)
+	login := false
+	uid, _ := c.Get("uid")
+	if uid.(int) > 0 {
+		login = true
+	}
+	response.OkWithData(socialService.DisplayComment(bid, uid.(int), login), c)
+}
+
+func (this *CommentController) Like(c *rum.Context) {
+	uid, _ := c.Get("uid")
+	if uid.(int) < 1 {
+		response.FailWithMessage("用户未登录", c)
+		return
+	}
+	commentId, err := strconv.Atoi(c.Param("commentId"))
+	if err != nil {
+		response.FailWithMessage("commentId应该为数字", c)
+		return
+	}
+	response.OkWithData(socialService.Like(commentId, uid.(int)), c)
 }

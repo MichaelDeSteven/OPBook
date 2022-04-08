@@ -27,6 +27,7 @@ type CommentResult struct {
 	ReplyNickname string    `json:"reply_nickname"` // 被回复昵称
 	ReplyContent  string    `json:"reply_content"`  // 被回复评论
 	CommentTime   time.Time `json:"comment_time"`   // 评论时间
+	IsLike        bool      `json:"is_like"`        // 是否点赞
 }
 
 func (c *Comment) TableName() string {
@@ -35,6 +36,10 @@ func (c *Comment) TableName() string {
 
 func NewComment() *Comment {
 	return &Comment{}
+}
+
+func NewCommentResult() *CommentResult {
+	return &CommentResult{}
 }
 
 // 添加评论

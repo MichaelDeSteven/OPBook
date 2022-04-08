@@ -146,6 +146,14 @@
                           <i></i>
                           {{ new Date(item.comment_time).format("yyyy-MM-dd hh:mm:ss") }}
                         </span>
+                        <span class="text-bar">
+                          <i
+                            class
+                            :class="['like-ico', {'zan-hover' : item.is_like == true}, {'zan' : item.is_like == false}]"
+                            @click="Like(item)"
+                          ></i>
+                          <span class="text-offset">{{item.like_count}}</span>
+                        </span>
                         <span class="repley" @click="reply.id=item.id">
                           <i class="fa fa-comments-o"></i>
                           回复
@@ -390,6 +398,22 @@ export default {
         }
       });
     },
+    Like(item) {
+      service({
+        url: "/social/like/" + item.id,
+        method: "post",
+      }).then((res) => {
+        if (res.data.code === 0) {
+          item.is_like = res.data.data.is_like;
+          if (res.data.data.is_like === true) {
+            item.like_count = item.like_count + 1;
+          } else {
+            item.like_count = item.like_count - 1;
+          }
+        }
+        console.log(res);
+      });
+    },
   },
 };
 </script>
@@ -399,4 +423,29 @@ export default {
 @import "https://static.sitestack.cn/static/font-awesome/css/font-awesome.min.css";
 @import "https://static.sitestack.cn/static/css/toast.css";
 @import "https://static.sitestack.cn/static/css/main.css?version=v2.12.0-beta3";
+
+.like-ico {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  background: center/contain no-repeat;
+  vertical-align: text-top;
+  /* margin-right: 4px; */
+  margin-top: -2px;
+}
+.text-offset {
+  margin: auto;
+}
+.text-bar {
+  width: 50.7px;
+  height: 13.6px;
+}
+.zan {
+  background-size: 15px;
+  background-image: url("https://s1.hdslb.com/bfs/static/blive/blfe-dynamic-web/static/img/zan.0da89524.svg");
+}
+.zan-hover {
+  background-size: 15px;
+  background-image: url("https://s1.hdslb.com/bfs/static/blive/blfe-dynamic-web/static/img/zan-hover.ab577109.svg");
+}
 </style>
