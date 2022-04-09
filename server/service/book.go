@@ -384,3 +384,24 @@ func (bookservice *BookService) AddScore(score *model.Score) {
 func (bookservice *BookService) GetScore(score *model.Score) *model.Score {
 	return score.GetScore(score.BookId, score.UserId)
 }
+
+func (bookservice *BookService) SetBook(b *model.Book) {
+	b.UpdateBook(map[string]interface{}{"name": b.Name, "author": b.Author, "author_url": b.AuthorURL, "lang": b.Lang, "label": b.Label, "description": b.Description})
+}
+
+func (bookservice *BookService) UploadCover(b *model.Book) {
+	b.UpdateBook(map[string]interface{}{"cover": b.Cover})
+}
+
+func (bookservice *BookService) GetBookId(bookId int) *model.Book {
+	books, err := model.NewBook().GetBooksById([]int{bookId})
+	if err != nil {
+		global.LOG.Sugar().Error(err)
+		return nil
+	}
+	if len(books) < 1 {
+		global.LOG.Sugar().Errorf("未找到该书信息 bookId：%+v\n", bookId)
+		return nil
+	}
+	return books[0]
+}

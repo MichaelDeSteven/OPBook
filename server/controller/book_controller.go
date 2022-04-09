@@ -12,6 +12,8 @@ import (
 	"github.com/MichaelDeSteven/OPBook/server/model"
 	"github.com/MichaelDeSteven/OPBook/server/model/response"
 	"github.com/MichaelDeSteven/OPBook/server/utils"
+	"github.com/MichaelDeSteven/OPBook/server/utils/graphics"
+	"github.com/MichaelDeSteven/OPBook/server/utils/upload"
 	"github.com/MichaelDeSteven/rum"
 )
 
@@ -25,6 +27,7 @@ func Create(c *rum.Context) {
 	book.Author = strings.TrimSpace(book.Author)
 	book.Author = strings.TrimSpace(book.Author)
 	book.AuthorURL = strings.TrimSpace(book.AuthorURL)
+	book.Cover = utils.DefaultCover
 
 	if utils.Empty(book.Name) {
 		response.FailWithMessage("书籍名称不能为空", c)
@@ -229,4 +232,125 @@ func GetScore(c *rum.Context) {
 	}
 	response.OkWithData(bookService.GetScore(score), c)
 	return
+}
+
+func GetInfo(c *rum.Context) {
+	bookId, _ := strconv.Atoi(c.Param("bookId"))
+	if bookId < 1 {
+		response.FailWithMessage("bookId不合法", c)
+		return
+	}
+	book := bookService.GetBookId(bookId)
+	response.OkWithData(book, c)
+}
+
+func Setting(c *rum.Context) {
+	book := model.NewBook()
+	c.Bind(book)
+
+	if utils.Empty(book.Name) {
+		response.FailWithMessage("书籍名称不能为空", c)
+		return
+	}
+	if utils.Empty(book.Lang) {
+		response.FailWithMessage("语言不能为空", c)
+		return
+	}
+	if strings.Count(book.Description, "") > 500 {
+		response.FailWithMessage("书籍描述不能大于500字", c)
+		return
+	}
+	bookService.SetBook(book)
+	response.Ok(c)
+}
+
+func UploadCover(c *rum.Context) {
+	form := model.CoverForm{}
+	c.Bind(&form)
+	file := form.Cover
+	if file == nil {
+		global.LOG.Sugar().Infof("读取文件异常!")
+		response.FailWithMessage("读取文件异常", c)
+		return
+	}
+
+	ext := filepath.Ext(file.Filename)
+	if !strings.EqualFold(ext, ".png") &&
+		!strings.EqualFold(ext, ".jpg") &&
+		!strings.EqualFold(ext, ".gif") &&
+		!strings.EqualFold(ext, ".jpeg") {
+		global.LOG.Sugar().Infof("不支持的图片格式!")
+		response.FailWithMessage("不支持的图片格式", c)
+		return
+	}
+
+	x1, _ := strconv.ParseFloat(form.X, 10)
+	y1, _ := strconv.ParseFloat(form.Y, 10)
+	w1, _ := strconv.ParseFloat(form.Width, 10)
+	h1, _ := strconv.ParseFloat(form.Height, 10)
+
+	x := int(x1)
+	y := int(y1)
+	width := int(w1)
+	height := int(h1)
+
+	global.LOG.Sugar().Infof("x:%d", x)
+	global.LOG.Sugar().Infof("y:%d", y)
+	global.LOG.Sugar().Infof("width:%d", width)
+	global.LOG.Sugar().Infof("height:%d", height)
+
+	fileName := strconv.FormatInt(time.Now().UnixNano(), 16)
+
+	filePath := filepath.Join("./", global.CONFIG.Local.Path, "tmp", global.CONFIG.Local.Book, time.Now().Format("2006/01"), fileName+ext)
+
+	path := filepath.Dir(filePath)
+
+	os.MkdirAll(path, os.ModePerm)
+
+	if err := c.SaveUploadedFile(file, filePath); err != nil {
+		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
+		response.FailWithMessage("保存图片失败", c)
+		return
+	}
+	// 剪切图片
+	subImg, err := graphics.ImageCopyFromFile(filePath, x, y, width, height)
+
+	if err != nil {
+		global.LOG.Sugar().Errorf("头像剪切失败: %+v\n", err)
+		response.FailWithMessage("头像剪切失败", c)
+	}
+	os.Remove(filePath)
+
+	// 保存剪切图片
+	filePath = filepath.Join("./", global.CONFIG.Local.Path, "tmp", time.Now().Format("200601"), fileName+ext)
+
+	err = graphics.ImageResizeSaveFile(subImg, 120, 120, filePath)
+	err = graphics.SaveImage(filePath, subImg)
+
+	if err != nil {
+		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
+		response.FailWithMessage("保存图片失败", c)
+		return
+	}
+
+	oss := upload.NewOss()
+	url, _, err := oss.UploadFileByPath(filePath, fileName, ext)
+	if err != nil {
+		global.LOG.Sugar().Errorf("保存图片失败: %+v\n", err)
+		response.FailWithMessage("保存图片失败", c)
+		return
+	}
+
+	// 更新书籍封面
+	book, err := model.NewBook().GetById(form.BookId)
+	oldCover := book.Cover
+	book.Cover, book.Id = url, form.BookId
+	bookService.UploadCover(book)
+	os.Remove(filePath)
+	if strings.Compare(oldCover, utils.DefaultCover) != 0 {
+		if err = oss.DeleteFile(oldCover); err != nil {
+			global.LOG.Sugar().Info(err)
+		}
+	}
+	response.OkWithDetailed(book, "上传封面成功", c)
 }

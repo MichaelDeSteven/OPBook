@@ -20,4 +20,7 @@ func (s *BookRouter) InitBookRouter(r *rum.RouterGroup) {
 	bookRouter.GET("/collect/stat/:bookId", controller.IsStar)
 	bookRouter.POST("/score/add", controller.AddScore)
 	bookRouter.POST("/score/get", controller.GetScore)
+	bookRouter.GET("/info/:bookId", controller.GetInfo)
+	bookRouter.POST("/setting", controller.Setting)
+	bookRouter.POST("/uploadCover", controller.UploadCover)
 }

@@ -13,6 +13,7 @@ import Intro from '@/view/book/intro'
 import Search from '@/view/search/search'
 import SearchResult from '@/view/search/result'
 import Whisper from '@/view/mail/whisper'
+import BookSetting from '@/view/book/setting'
 Vue.use(Router)
 
 export default new Router({
@@ -82,6 +83,11 @@ export default new Router({
         path: '/whisper/:uid',
         name: 'Whisper',
         component: Whisper
+    },
+    {
+        path: '/book/setting/:bookId',
+        name: 'BookSetting',
+        component: BookSetting
     }
   ]
 })

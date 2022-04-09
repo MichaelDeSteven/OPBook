@@ -149,3 +149,7 @@ func (b *Book) GetScore(bookId int) *Book {
 func (b *Book) SetScore(book *Book) {
 	global.DB.Model(b).Where("is_deleted = ?", 0).Where("id = ?", book.Id).Updates(map[string]interface{}{"score_count": book.ScoreCount, "score": book.Score})
 }
+
+func (b *Book) UpdateBook(value interface{}) {
+	global.DB.Model(b).Where("is_deleted = ?", 0).Where("id = ?", b.Id).Updates(value)
+}

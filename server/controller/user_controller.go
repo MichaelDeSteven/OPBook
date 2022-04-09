@@ -232,8 +232,10 @@ func UploadAvatar(c *rum.Context) {
 		return
 	}
 	os.Remove(filePath)
-	if err = oss.DeleteFile(oldAvatar); err != nil {
-		global.LOG.Sugar().Info(err)
+	if strings.Compare(oldAvatar, utils.DefaultAvatar) != 0 {
+		if err = oss.DeleteFile(oldAvatar); err != nil {
+			global.LOG.Sugar().Info(err)
+		}
 	}
 	response.OkWithDetailed(user, "保存图片成功", c)
 }
