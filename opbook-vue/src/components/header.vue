@@ -43,9 +43,9 @@
           </ul>
         </div>
 
-        <a href class="navbar-brand" title>
-          <img class="logo" src="../../static/images/logo.png" alt />
-        </a>
+        <!-- <a href class="navbar-brand" title>
+          <img class="logo" src="../../static/images/gologo.png" alt />
+        </a>-->
         <nav class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class>
@@ -168,7 +168,7 @@ export default {
       localStorage.setItem("user", null);
       localStorage.setItem("token", null);
       this.loginStat = true;
-      window.location = "/index";
+      window.location = "/login";
     },
   },
 };

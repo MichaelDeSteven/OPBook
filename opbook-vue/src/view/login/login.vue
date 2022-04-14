@@ -125,7 +125,7 @@ export default {
           layer.msg(res.data.msg);
           localStorage.setItem("user", JSON.stringify(res.data.data.user));
           localStorage.setItem("token", res.data.data.token);
-          window.location = "/user";
+          window.location = "/user/" + res.data.data.user.id;
         } else {
           layer.msg(res.data.msg);
         }

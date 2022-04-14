@@ -152,7 +152,7 @@ export default {
         console.log(res);
         if (res.code === 0) {
           layer.msg(res.data.msg);
-          window.location = "/user";
+          window.location = "/login";
         } else {
           layer.msg(res.data.msg);
         }
