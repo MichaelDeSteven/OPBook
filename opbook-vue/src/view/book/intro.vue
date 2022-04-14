@@ -7,7 +7,9 @@
           <h1>{{ book.name }}</h1>
           <div class="help-block subbookname">
             <span>语言：</span>
-            <span style="color: red">中文</span>
+            <span
+              style="color: red"
+            >{{ book.lang === "ch" ? "中文" : (book.lang === "en" ? "英文" : "其它")}}</span>
             <span class="mgl-10px">评分：</span>
             <i class="bookstack-star"></i>
             {{ book.score*1.0 / 10.0 }}
@@ -28,7 +30,7 @@
         <div class="col-sm-3 col-xs-4 col-md-3 col-lg-2">
           <div class="recommend-bookend mgt-15px">
             <img
-              src
+              :src="book.cover"
               onerror="this.src='/static/images/book.png'"
               class="img-responsive border-cover-img"
               alt=".Book.BookName"
@@ -41,10 +43,9 @@
               <span>来源：</span>
               <a :href="book.author_url" target="_blank" title>{{book.author}}</a>
             </li>
-            <!-- <li class="bookstack-labels">
-              <a target="_blank" title="javascript" href="/tag/javascript">javascript</a>
-              <a target="_blank" title="阮一峰" href="/tag/阮一峰">阮一峰</a>
-            </li>-->
+            <li class="bookstack-labels" v-if="labels.length > 0 && labels[0].length > 0">
+              <a target="_blank" :href="'/search/result?wd=' + item" v-for="item in labels">{{item}}</a>
+            </li>
             <li class="bookstack-description hidden-xs">{{ book.description }}</li>
             <li class="book-metadata hidden-xs">
               {{ book.doc_count }}
@@ -87,7 +88,7 @@
               <div v-if="select===0">
                 <li v-for="item in menuTop" :key="item.id">
                   <a
-                    :href="'/read/' + book.name + '/' + item.identify"
+                    :href="'/read/' + book.identify + '/' + item.identify"
                     target="_blank"
                     :title="item.name"
                   >{{ item.name }}</a>
@@ -250,6 +251,7 @@ export default {
         score: 0,
       },
       myScore: [false, false, false, false, false],
+      labels: [],
     };
   },
   beforeCreate() {
@@ -297,6 +299,7 @@ export default {
           var arr = document.getElementsByClassName("bookstack-star");
           arr[0].classList.add("star-" + this.book.score);
           this.GetScore();
+          this.labels = this.book.label.split(",");
         } else {
         }
       });
