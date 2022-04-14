@@ -17,7 +17,7 @@
                 >添加书籍</button>
               </div>
               <div class="help-block text-left" style="margin-top: 15px;">
-                <span class="text-danger">凡是违反国家法律法规或恶意发布的内容，本站有权在不提前告知的情况下对内容进行删除，请须知！</span>
+                <!-- <span class="text-danger">凡是违反国家法律法规或恶意发布的内容，本站有权在不提前告知的情况下对内容进行删除，请须知！</span> -->
               </div>
               <!-- <ul class="nav nav-tabs" style="margin-top: 15px;">
                 <li :class="{'active':pub == 0}" @click="checkout(0)">
@@ -62,7 +62,7 @@
                         <img
                           onerror="this.src='/static/images/book.png'"
                           class="img-responsive border-cover-img"
-                          src
+                          :src="item.cover"
                           alt
                         />
                       </a>
@@ -71,7 +71,7 @@
                       <div class="book-title">
                         <div class="pull-left">
                           <a href title="查看文档" data-toggle="tooltip">
-                            <i class="fa fa-unlock" aria-hidden="true"></i>
+                            <i aria-hidden="true"></i>
                             {{ item.name }}
                           </a>
                         </div>
@@ -102,17 +102,17 @@
                       <div class="desc-text">{{ item.description }}</div>
                       <div class="btns">
                         <a
-                          href
-                          title="查看文档"
+                          :href="'introduct/' + item.identify"
+                          title="查看书籍"
                           class="btn btn-default btn-sm"
                           data-toggle="tooltip"
                           target="_blank"
                         >
                           <i class="fa fa-eye"></i> 查看
-                          <span class="hidden-xs">文档</span>
+                          <span class="hidden-xs">书籍</span>
                         </a>
                         <a
-                          href
+                          :href="'book/setting/' + item.id"
                           title="书籍设置"
                           class="btn btn-default btn-sm"
                           data-toggle="tooltip"
@@ -128,10 +128,10 @@
                         >
                           <i class="fa fa-book"></i> 发布书籍
                         </a>
-                        <a href title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm">
+                        <!-- <a href title="编辑文档" data-toggle="tooltip" class="btn btn-default btn-sm">
                           <i class="fa fa-edit" aria-hidden="true"></i> 编辑
                           <span class="hidden-xs">文档</span>
-                        </a>
+                        </a>-->
                         <!-- Split button -->
                         <div class="btn-group">
                           <button type="button" class="btn btn-default">
@@ -293,7 +293,7 @@
                   v-model="book.description"
                 ></textarea>
               </div>
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <div class="col-lg-6">
                   <label>
                     <input type="radio" name="privately_owned" value="1" v-model="book.private" /> 私有
@@ -313,7 +313,7 @@
                   </label>
                 </div>
                 <div class="clearfix"></div>
-              </div>
+              </div>-->
               <div class="clearfix"></div>
             </div>
             <div class="modal-footer">
