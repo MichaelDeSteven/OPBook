@@ -25,5 +25,9 @@ func (s *BaseRouter) InitBaseRouter(r *rum.RouterGroup) {
 	searchController := controller.SearchController{}
 	r.POST("/search", searchController.Result)
 	r.POST("/book/user/collect", controller.UserCollection)
-
+	userRouter := r.Group("user")
+	userRouter.Use(middleware.Recovery(true)).Use(middleware.DefaultLogger())
+	userRouter.POST("/login", controller.Login)
+	userRouter.POST("/reg", controller.Reg)
+	userRouter.GET("/:uid", controller.GetUserProfile)
 }
