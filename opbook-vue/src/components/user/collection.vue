@@ -7,7 +7,7 @@
             <a :href="'/introduct/' + item.identify" target="_blank" title>
               <img
                 onerror="this.src='/static/images/book.png'"
-                src
+                :src="item.cover"
                 alt
                 class="img-responsive border-cover-img"
               />

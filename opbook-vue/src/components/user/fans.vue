@@ -50,7 +50,7 @@ export default {
   methods: {
     GetFollowers() {
       service({
-        url: "/social/fan/getFollowers",
+        url: "/social/fan/getFollowees",
         method: "post",
         data: this.page,
       }).then((res) => {

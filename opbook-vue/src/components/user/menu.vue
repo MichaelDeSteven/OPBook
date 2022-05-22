@@ -18,7 +18,7 @@
         </a>
       </li>-->
       <li class>
-        <a href="book" class="item">
+        <a href="/book" class="item">
           <i class="fa fa-heart-o" aria-hidden="true"></i> 书籍列表
         </a>
       </li>
